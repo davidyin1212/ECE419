@@ -23,9 +23,13 @@ import javax.swing.JTextPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JOptionPane;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+
 import javax.swing.BorderFactory;
+
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -118,8 +122,9 @@ public class Mazewar extends JFrame {
        
         /** 
          * The place where all the pieces are put together. 
+         * @throws IOException 
          */
-        public Mazewar() {
+        public Mazewar(String hostname, int portNumb) throws IOException {
                 super("ECE419 Mazewar");
                 consolePrintLn("ECE419 Mazewar started!");
                 
@@ -133,12 +138,21 @@ public class Mazewar extends JFrame {
                 assert(scoreModel != null);
                 maze.addMazeListener(scoreModel);
                 
-                // Throw up a dialog to get the GUIClient name.
+                // Init Mazewar Client
+                
+                MazewarClient mc = new MazewarClient(hostname, portNumb);
+                mc.connectToServer();
+                
                 String name = JOptionPane.showInputDialog("Enter your name");
                 if((name == null) || (name.length() == 0)) {
                   Mazewar.quit();
                 }
                 
+                mc.sendJoinMessage(name);
+                /* Try until successfully registers to Server */
+                // Throw up a dialog to get the GUIClient name.
+                
+
                 // You may want to put your network initialization code somewhere in
                 // here.
                 
@@ -221,10 +235,19 @@ public class Mazewar extends JFrame {
         /**
          * Entry point for the game.  
          * @param args Command-line arguments.
+         * @throws IOException 
          */
-        public static void main(String args[]) {
-
-                /* Create the GUI */
-                new Mazewar();
+        public static void main(String args[]) throws IOException {
+        	
+    		if (args.length != 2) {
+    			System.err.println("Usage: java MazewarServer <hostname> <port number>");
+    			System.exit(1);
+    		}
+    		
+    		String hostname = args[0];
+    		int portNumb = Integer.parseInt(args[1]);
+    	
+    		/* Create the GUI */
+    		new Mazewar(hostname, portNumb);
         }
 }

@@ -24,8 +24,7 @@ public class MazewarClient implements Runnable{
 
 	@Override
 	public void run() {
-		connectToServer();
-		
+
 	}
 	
 	
@@ -33,6 +32,7 @@ public class MazewarClient implements Runnable{
 		System.out.println("Trying to connect to server...");
 		/* Try until successfully opens socket */
 		while (! isConnected) {
+
 			try {
 				this.clientSocket = new Socket(hostname, portNumber);
 				isConnected = true;
@@ -50,11 +50,14 @@ public class MazewarClient implements Runnable{
 				}
 			}
 		}
+
 		
 		/* Open IO Stream */
 		try {
-			this.inputStream = new ObjectInputStream(this.clientSocket.getInputStream());
 			this.outputStream = new ObjectOutputStream(this.clientSocket.getOutputStream());
+			this.inputStream = new ObjectInputStream(this.clientSocket.getInputStream());
+			
+			System.out.println("opened io stream");
 		} catch (IOException e) {
 			System.err.println("Error while opening I/O Stream");
 			// TODO Auto-generated catch block
