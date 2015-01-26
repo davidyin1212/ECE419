@@ -114,6 +114,10 @@ public abstract class Client {
          */
         private String name = null;
        
+        /**
+         * clientID given from server
+         */
+        private int clientID = -1;
         /** 
          * Create a new client with the specified name.
          */
@@ -214,7 +218,8 @@ public abstract class Client {
          * Notify listeners that the client fired.
          */
         private void notifyFire() {
-                notifyListeners(ClientEvent.fire);       
+                notifyListeners(ClientEvent.fire);    
+                
         }
         
         /**
