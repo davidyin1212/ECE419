@@ -24,7 +24,7 @@ public class MazewarClient implements Runnable{
 
 	@Override
 	public void run() {
-
+		
 	}
 	
 	
@@ -75,11 +75,11 @@ public class MazewarClient implements Runnable{
 	 * */
 	public boolean sendJoinMessage(String playerName) throws IOException {
 		
-		GameMessagePacket response; 
+		MessagePacket response; 
 		boolean isSetupMessageForMe = false;
 		/* Send Join Request */
-		GameMessagePacket gmp = new GameMessagePacket();
-		gmp.messageType = GameMessagePacket.JOIN_GAME_REQUEST;
+		MessagePacket gmp = new MessagePacket();
+		gmp.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_REQUEST;
 		gmp.playerName = playerName;
 		
 		this.outputStream.writeObject(gmp);
@@ -89,16 +89,16 @@ public class MazewarClient implements Runnable{
 		try {
 			
 			while (! isSetupMessageForMe) {
-				response = (GameMessagePacket) this.inputStream.readObject();
+				response = (MessagePacket) this.inputStream.readObject();
 				isSetupMessageForMe = 
-						(response.messageType == GameMessagePacket.JOIN_GAME_SUCCESS
-						|| response.messageType == GameMessagePacket.JOIN_GAME_FAILURE)
+						(response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS
+						|| response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE)
 						&& response.messageTarget == playerName;
 				
 				if (isSetupMessageForMe) {
-					if (response.messageType == GameMessagePacket.JOIN_GAME_SUCCESS){
+					if (response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS){
 						/* Now ready to start game. Setup by processing setupMessage */
-						SetupMessagePacket smp = response.setupMessagePacket;
+						MessagePacket smp = response.setupMessagePacket;
 						// Do whatever I want to setup new game.
 						return true;
 					}

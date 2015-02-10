@@ -10,11 +10,13 @@ public class MazewarServerWorker implements Runnable {
 	public ObjectInputStream inputStream;
 	public ObjectOutputStream outputStream;
 	private boolean acceptedClient = false;
+	private String name;
 	
 	public MazewarServerWorker(Socket socket) throws IOException {
 		this.socket = socket;
 		this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 		this.inputStream = new ObjectInputStream(socket.getInputStream());
+		this.name = "";
 	}
 	
 	public void run() {		
@@ -33,13 +35,15 @@ public class MazewarServerWorker implements Runnable {
 			Object o;
 			try {
 				o = inputStream.readObject();
-				if (o instanceof GameMessagePacket) {
-					GameMessagePacket joinMessage = (GameMessagePacket) o;
+				if (o instanceof MessagePacket) {
+					MessagePacket joinMessage = (MessagePacket) o;
 					/* New client initiated JOIN */
-					if (joinMessage.messageType == GameMessagePacket.JOIN_GAME_REQUEST) {
+					if (joinMessage.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_REQUEST) {
 						
-						System.out.println("Received GAME JOIN MESSAGE FROM CLIENT : " + joinMessage.playerName);
-						
+						System.err.println("Received GAME JOIN MESSAGE FROM CLIENT : " + joinMessage.playerName);
+						if (MazewarServer.hasPlayer(joinMessage.playerName)) {
+							System.err.println("Username already exists - Rejecting");
+						}
 						
 						acceptedClient = true;
 					}
@@ -50,5 +54,9 @@ public class MazewarServerWorker implements Runnable {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public String getName() {
+		return name;
 	}
 }
