@@ -66,17 +66,17 @@ public class MazewarClient implements Runnable{
 		}
 		
 		
-		System.out.println("Successfully connected to server");
+		System.out.println("Initialized Socket and I/O Stream");
 		
 	}
 	 
 	/*
 	 * Returns true upon success, false on failure
 	 * */
-	public boolean sendJoinMessage(String playerName) throws IOException {
-		
+	public MessagePacket sendJoinMessage(String playerName) throws IOException {
+
 		MessagePacket response; 
-		boolean isSetupMessageForMe = false;
+		boolean isSetupMessage = false;
 		/* Send Join Request */
 		MessagePacket gmp = new MessagePacket();
 		gmp.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_REQUEST;
@@ -88,24 +88,14 @@ public class MazewarClient implements Runnable{
 		/* Upon Success, we may start game */
 		try {
 			
-			while (! isSetupMessageForMe) {
+			while (! isSetupMessage) {
 				response = (MessagePacket) this.inputStream.readObject();
-				isSetupMessageForMe = 
+				isSetupMessage = 
 						(response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS
-						|| response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE)
-						&& response.messageTarget == playerName;
+						|| response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE);
 				
-				if (isSetupMessageForMe) {
-					if (response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS){
-						/* Now ready to start game. Setup by processing setupMessage */
-						MessagePacket smp = response.setupMessagePacket;
-						// Do whatever I want to setup new game.
-						return true;
-					}
-			
-				/* Failure likely due to duplicate name */
-				return false;
-				}
+				if (isSetupMessage)
+					return response;
 			}
 
 		} catch (Exception e) {
@@ -114,8 +104,8 @@ public class MazewarClient implements Runnable{
 			e.printStackTrace();
 			System.exit(1);
 		}
-		return false;
 		
+		return null;
 	}
 	
 	

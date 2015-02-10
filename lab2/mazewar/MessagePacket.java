@@ -65,5 +65,10 @@ public class MessagePacket implements Serializable {
 	public String playerName; /* Represents player who sent the message */
 	HashMap<String, Point> playerLocations;
 	public Point point;
+	
+	public String toString() {
+		return String.format("MessageType:%d Reason:%d", messageType, reason);
+		
+	}
 
 }

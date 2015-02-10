@@ -142,13 +142,24 @@ public class Mazewar extends JFrame {
                 
                 MazewarClient mc = new MazewarClient(hostname, portNumb);
                 mc.connectToServer();
+
+                MessagePacket response;
+                String name;
+                do {
+                    name = JOptionPane.showInputDialog("Enter your name (Empty string to quit)");
+                    if((name == null) || (name.length() == 0)) {
+                      Mazewar.quit();
+                    }
+                    
+                	response = mc.sendJoinMessage(name);
+                	if (response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE
+                			&& response.reason == MessagePacket.ERROR_REASON_SERVER_FULL) {
+                		System.err.println("Server Full - exiting");
+                		Mazewar.quit();       
+                	}
+                } while (response.messageType != MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS);
                 
-                String name = JOptionPane.showInputDialog("Enter your name");
-                if((name == null) || (name.length() == 0)) {
-                  Mazewar.quit();
-                }
-                
-                mc.sendJoinMessage(name);
+                System.out.println(response.toString());
                 /* Try until successfully registers to Server */
                 // Throw up a dialog to get the GUIClient name.
                 

@@ -19,11 +19,13 @@ public class MazewarServer {
 	private static BufferedReader stdIn;
 	private static int nextSeqNum;
 	private static int maxClients;
+	private static boolean gameStarted;
 	
 	private static void serverInit() {
 		serverWorkers = new Vector<MazewarServerWorker>();
 		nextSeqNum = 0;
 		maxClients = 4;
+		gameStarted = false;
 	}
 	
 	
@@ -40,17 +42,17 @@ public class MazewarServer {
 			System.exit(1);
 		}
 		
-		/* Accept clients until we reach max clients */ 
-		while (serverWorkers.size() <= maxClients ) {
+		/* Accept Clients, spawn thread as delegate */
+		while (true) {
 			try {
 				MazewarServerWorker worker;
 				/* Accept Incoming connection */
-				System.out.println("Waiting for clients' connection");
+				System.err.println("Waiting for clients' connection");
 				worker = new MazewarServerWorker(serverSocket.accept());
-				System.out.println("Accepted Client");
+				System.err.println("Accepted Client");
 				
 				/* Register designated client socket into our vector*/
-				serverWorkers.add(worker);
+	
 				
 				/* Start worker thread */
 				(new Thread(worker)).start(); 
@@ -61,32 +63,53 @@ public class MazewarServer {
 			}
 		}
 		
-		/* We reached max clients - Send GameStart Message */
-		 
-		/* Further requests will be rejected */
-		while (true) {
-			try {
-				ObjectOutputStream outputStream;
-				
-				Socket s = serverSocket.accept();
-				
-				/* Create Reject Message Packet */
-				MessagePacket rejectPacket = new MessagePacket();
-				rejectPacket.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE;
-				rejectPacket.reason = MessagePacket.ERROR_REASON_SERVER_FULL;
-				
-				outputStream = new ObjectOutputStream(s.getOutputStream());
-				outputStream.writeObject(rejectPacket);
-				outputStream.close();
-				s.close();
-				
-				System.err.println("Rejected Client - Reason: Server FULL");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+//		/* We reached max clients - Send GameStart Message */
+//		 
+//		/* Further requests will be rejected */
+//		while (true) {
+//			try {
+//				ObjectOutputStream outputStream;
+//				
+//				Socket s = serverSocket.accept();
+//				
+//				/* Create Reject Message Packet */
+//				MessagePacket rejectPacket = new MessagePacket();
+//				rejectPacket.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE;
+//				rejectPacket.reason = MessagePacket.ERROR_REASON_SERVER_FULL;
+//				
+//				outputStream = new ObjectOutputStream(s.getOutputStream());
+//				outputStream.writeObject(rejectPacket);
+//				outputStream.close();
+//				s.close();
+//				
+//				System.err.println("Rejected Client - Reason: Server FULL");
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//		}
+	}
+	
+	/*  */
+	public static synchronized MessagePacket testAndAcceptClient(String username, MazewarServerWorker worker) {
+		MessagePacket packet = new MessagePacket();
+		
+		if (gameStarted || serverWorkers.size() == maxClients) {
+			packet.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE;
+			packet.reason = MessagePacket.ERROR_REASON_SERVER_FULL;
 		}
+		
+		else if (hasPlayer(username)) {
+			packet.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE;
+			packet.reason = MessagePacket.ERROR_REASON_PLAYERNAME_EXISTS;
+		}
+		else {
+			serverWorkers.addElement(worker);
+			packet.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS;
+		}
+		
+		return packet;
 	}
 	
 	public static synchronized boolean hasPlayer(String username) {
