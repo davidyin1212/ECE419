@@ -143,10 +143,24 @@ public class Mazewar extends JFrame {
                 MazewarClient mc = new MazewarClient(hostname, portNumb);
                 mc.connectToServer();
 
+                /* Send Join Request to server. 
+                 * Upon JOIN_GAME_SUCCESS, initialize game and wait for GAME_START message
+                 * Upon JOIN_GAME_FAILURE, server will set reason on MessagePacket.
+                 * If failed because user name exists on server, re-prompt user to type in new 
+                 * username, otherwise(failed because the server is full) exit program.
+                 * */
                 MessagePacket response;
-                String name;
+                String prompt, name = "";
+                boolean nameExists = false;
+          
                 do {
-                    name = JOptionPane.showInputDialog("Enter your name (Empty string to quit)");
+                	/* Alert user if username already exists on server */
+                	if (nameExists)
+                		prompt = "Username(" + name + ") already exists.\nSelect new name (Empty string to quit)";
+                	else
+                		prompt = "Enter your name (Empty string to quit)";
+      
+                    name = JOptionPane.showInputDialog(prompt);
                     if((name == null) || (name.length() == 0)) {
                       Mazewar.quit();
                     }
@@ -157,6 +171,10 @@ public class Mazewar extends JFrame {
                 		System.err.println("Server Full - exiting");
                 		Mazewar.quit();       
                 	}
+                	else {
+                		nameExists = true;
+                	}
+                	
                 } while (response.messageType != MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS);
                 
                 System.out.println(response.toString());
@@ -174,12 +192,12 @@ public class Mazewar extends JFrame {
                 
                 // Use braces to force constructors not to be called at the beginning of the
                 // constructor.
-                {
-                        maze.addClient(new RobotClient("Norby"));
-                        maze.addClient(new RobotClient("Robbie"));
-                        maze.addClient(new RobotClient("Clango"));
-                        maze.addClient(new RobotClient("Marvin"));
-                }
+//                {
+//                        maze.addClient(new RobotClient("Norby"));
+//                        maze.addClient(new RobotClient("Robbie"));
+//                        maze.addClient(new RobotClient("Clango"));
+//                        maze.addClient(new RobotClient("Marvin"));
+//                }
 
                 
                 // Create the panel that will display the maze.
