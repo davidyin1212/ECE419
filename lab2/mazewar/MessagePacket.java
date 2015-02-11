@@ -67,7 +67,7 @@ public class MessagePacket implements Serializable {
 	public Point point;
 	
 	public String toString() {
-		return String.format("MessageType:%d Reason:%d", messageType, reason);
+		return String.format("(MessageType:%d , Reason:%d , seqNo:%d , playerName:%s", messageType, reason, seqNo, playerName);
 		
 	}
 

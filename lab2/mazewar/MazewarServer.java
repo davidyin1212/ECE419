@@ -8,11 +8,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class MazewarServer {
 	private static int portNumber;
-	private static Vector<MazewarServerWorker> serverWorkers; /* Vector containing worker per client*/
+	private static Vector<MazewarClient> clients; /* Vector containing worker per client*/
 	private static ServerSocket serverSocket;
 	private static PrintWriter out;
 	private static BufferedReader in;
@@ -20,12 +21,44 @@ public class MazewarServer {
 	private static int nextSeqNum;
 	private static int maxClients;
 	private static boolean gameStarted;
+	private static ConcurrentLinkedQueue<MessagePacket> messageQueue;
+	private static MazewarServerBroadcaster broadcaster;
+	
+	public static synchronized void enqueueMessage(MessagePacket packet) {
+		messageQueue.add(packet);
+	}
+	
+	public static synchronized MessagePacket dequeueMessage() {
+		return messageQueue.poll();
+	}
+	public static synchronized boolean hasNextMessage() {
+		return messageQueue.peek() != null;
+	}
+	
+	public static void addClient(MazewarClient client) {
+		clients.add(client);
+		System.out.println("Add Client :" + clients.size());
+	}
+	
+	public static boolean isFullServer() {
+		return clients.size() == maxClients;
+	}
+	
+	
+	public static Iterator<MazewarClient> getClientIter() {
+		return clients.iterator();
+	}
+
+	public static int getNextSeqNum() {
+		return nextSeqNum++;
+	}	
 	
 	private static void serverInit() {
-		serverWorkers = new Vector<MazewarServerWorker>();
+		clients = new Vector<MazewarClient>();
 		nextSeqNum = 0;
-		maxClients = 4;
+		maxClients = 2;
 		gameStarted = false;
+		messageQueue = new ConcurrentLinkedQueue<MessagePacket>();
 	}
 	
 	
@@ -45,14 +78,11 @@ public class MazewarServer {
 		/* Accept Clients, spawn thread as delegate */
 		while (true) {
 			try {
-				MazewarServerWorker worker;
+				MazewarClient worker;
 				/* Accept Incoming connection */
 				System.err.println("Waiting for clients' connection");
-				worker = new MazewarServerWorker(serverSocket.accept());
+				worker = new MazewarClient(serverSocket.accept());
 				System.err.println("Accepted Client");
-				
-				/* Register designated client socket into our vector*/
-	
 				
 				/* Start worker thread */
 				(new Thread(worker)).start(); 
@@ -62,40 +92,21 @@ public class MazewarServer {
 				System.exit(1);
 			}
 		}
+	
+	}
+	
+	public static void startGame() {
+		assert (clients.size() == maxClients);
 		
-//		/* We reached max clients - Send GameStart Message */
-//		 
-//		/* Further requests will be rejected */
-//		while (true) {
-//			try {
-//				ObjectOutputStream outputStream;
-//				
-//				Socket s = serverSocket.accept();
-//				
-//				/* Create Reject Message Packet */
-//				MessagePacket rejectPacket = new MessagePacket();
-//				rejectPacket.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE;
-//				rejectPacket.reason = MessagePacket.ERROR_REASON_SERVER_FULL;
-//				
-//				outputStream = new ObjectOutputStream(s.getOutputStream());
-//				outputStream.writeObject(rejectPacket);
-//				outputStream.close();
-//				s.close();
-//				
-//				System.err.println("Rejected Client - Reason: Server FULL");
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
-//		}
+		broadcaster = new MazewarServerBroadcaster();
+		(new Thread(broadcaster)).start();
 	}
 	
 	/*  */
-	public static synchronized MessagePacket testAndAcceptClient(String username, MazewarServerWorker worker) {
+	public static synchronized MessagePacket testAndAcceptClient(String username, MazewarClient worker) {
 		MessagePacket packet = new MessagePacket();
 		
-		if (gameStarted || serverWorkers.size() == maxClients) {
+		if (gameStarted || clients.size() == maxClients) {
 			packet.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE;
 			packet.reason = MessagePacket.ERROR_REASON_SERVER_FULL;
 		}
@@ -105,7 +116,7 @@ public class MazewarServer {
 			packet.reason = MessagePacket.ERROR_REASON_PLAYERNAME_EXISTS;
 		}
 		else {
-			serverWorkers.addElement(worker);
+			clients.addElement(worker);
 			packet.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS;
 		}
 		
@@ -113,7 +124,7 @@ public class MazewarServer {
 	}
 	
 	public static synchronized boolean hasPlayer(String username) {
-		Iterator<MazewarServerWorker> it = serverWorkers.iterator();
+		Iterator<MazewarClient> it = clients.iterator();
 		while (it.hasNext()) {
 			if (it.next().getName().equals(username))
 				return true;
@@ -130,7 +141,6 @@ public class MazewarServer {
 		}
 		
 		portNumber = Integer.parseInt(args[0]);
-		
 		startServer();
 		
 	

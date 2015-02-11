@@ -44,12 +44,12 @@ public class Mazewar extends JFrame {
         /**
          * The default width of the {@link Maze}.
          */
-        private final int mazeWidth = 20;
+        public static final int mazeWidth = 20;
 
         /**
          * The default height of the {@link Maze}.
          */
-        private final int mazeHeight = 10;
+        public static final int mazeHeight = 10;
 
         /**
          * The default random seed for the {@link Maze}.
@@ -140,8 +140,8 @@ public class Mazewar extends JFrame {
                 
                 // Init Mazewar Client
                 
-                MazewarClient mc = new MazewarClient(hostname, portNumb);
-                mc.connectToServer();
+                ClientCommunicator cc = new ClientCommunicator(hostname, portNumb);
+                cc.connectToServer();
 
                 /* Send Join Request to server. 
                  * Upon JOIN_GAME_SUCCESS, initialize game and wait for GAME_START message
@@ -165,7 +165,7 @@ public class Mazewar extends JFrame {
                       Mazewar.quit();
                     }
                     
-                	response = mc.sendJoinMessage(name);
+                	response = cc.sendJoinMessage(name);
                 	if (response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE
                 			&& response.reason == MessagePacket.ERROR_REASON_SERVER_FULL) {
                 		System.err.println("Server Full - exiting");
@@ -176,6 +176,10 @@ public class Mazewar extends JFrame {
                 	}
                 	
                 } while (response.messageType != MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS);
+                
+                (new Thread(cc)).start(); 
+                
+                
                 
                 System.out.println(response.toString());
                 /* Try until successfully registers to Server */

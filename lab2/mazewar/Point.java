@@ -88,4 +88,13 @@ public class Point implements Serializable {
                 /* Impossible */
                 return null;
         }
+        
+        public boolean equals(Point p) {
+        	return this.x == p.x && this.y == p.y;
+        	
+        }
+        
+        public String toString() {
+        	return String.format("Point (%d,%d)", x,y);
+        }
 }

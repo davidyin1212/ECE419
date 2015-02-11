@@ -79,6 +79,9 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 thread.start();
         }
        
+        public static Point getRandomPoint(Random randomGen) {
+        	return new Point(randomGen.nextInt(Mazewar.mazeWidth),randomGen.nextInt(Mazewar.mazeHeight));
+        }
         /** 
          * Create a maze from a serialized {@link MazeImpl} object written to a file.
          * @param mazefile The filename to load the serialized object from.

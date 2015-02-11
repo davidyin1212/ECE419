@@ -4,109 +4,104 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 
-public class MazewarClient implements Runnable{
-	private final int CONNECT_FAILURE_SLEEP_INTERVAL = 3000;
+/*
+ * MazewarClient from server's point of view
+ */
+public class MazewarClient implements Runnable {
+
+	public Socket socket;
+	public ObjectInputStream inputStream;
+	public ObjectOutputStream outputStream;
+	private boolean acceptedClient = false;
+	private String name;
 	
-	private int portNumber;
-	private String hostname; 
-	private boolean isConnected;
-	private Socket clientSocket;
-	
-	private ObjectOutputStream outputStream;
-	private ObjectInputStream inputStream;
-	
-	public MazewarClient(String hostname, int portNumber) {
-		this.hostname = hostname;
-		this.portNumber = portNumber;
-		this.isConnected = false;
+	public MazewarClient(Socket socket) throws IOException {
+		this.socket = socket;
+		this.outputStream = new ObjectOutputStream(socket.getOutputStream());
+		this.inputStream = new ObjectInputStream(socket.getInputStream());
+		this.name = "";
 	}
-
-
-	@Override
-	public void run() {
+	
+	public void run() {		
 		
-	}
-	
-	
-	public void connectToServer() {
-		System.out.println("Trying to connect to server...");
-		/* Try until successfully opens socket */
-		while (! isConnected) {
+		System.out.println("Thread Started");
 
-			try {
-				this.clientSocket = new Socket(hostname, portNumber);
-				isConnected = true;
-			}
-			/* Upon failure, sleep thread for  3 secs */
-			catch (Exception e) {
-				System.err.println ("Could not connect to server.. will try again in 3 seconds");
-				e.printStackTrace();
-
+		waitAndProcessJoinMessage();
+		
+		if (acceptedClient) {
+			while (! Thread.currentThread().isInterrupted()) {
 				try {
-					Thread.sleep(CONNECT_FAILURE_SLEEP_INTERVAL);
-				} catch (InterruptedException e1) {
+					MessagePacket incomingMsg = (MessagePacket) inputStream.readObject();
+					MazewarServer.enqueueMessage(incomingMsg);
+				} catch (ClassNotFoundException | IOException e) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					e.printStackTrace();
 				}
-			}
-		}
-
-		
-		/* Open IO Stream */
-		try {
-			this.outputStream = new ObjectOutputStream(this.clientSocket.getOutputStream());
-			this.inputStream = new ObjectInputStream(this.clientSocket.getInputStream());
-			
-			System.out.println("opened io stream");
-		} catch (IOException e) {
-			System.err.println("Error while opening I/O Stream");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		
-		System.out.println("Initialized Socket and I/O Stream");
-		
-	}
-	 
-	/*
-	 * Returns true upon success, false on failure
-	 * */
-	public MessagePacket sendJoinMessage(String playerName) throws IOException {
-
-		MessagePacket response; 
-		boolean isSetupMessage = false;
-		/* Send Join Request */
-		MessagePacket gmp = new MessagePacket();
-		gmp.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_REQUEST;
-		gmp.playerName = playerName;
-		
-		this.outputStream.writeObject(gmp);
-		this.outputStream.flush();
-		
-		/* Upon Success, we may start game */
-		try {
-			
-			while (! isSetupMessage) {
-				response = (MessagePacket) this.inputStream.readObject();
-				isSetupMessage = 
-						(response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS
-						|| response.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_FAILURE);
 				
-				if (isSetupMessage)
-					return response;
 			}
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			System.err.println("Exception while receiving Join Response");
-			e.printStackTrace();
-			System.exit(1);
 		}
-		
-		return null;
+		System.out.println("Disposing Thread");
+				
 	}
 	
+	public void waitAndProcessJoinMessage() {
+		while (! this.acceptedClient) {
+
+			Object o;
+			try {
+				o = inputStream.readObject();
+				if (o instanceof MessagePacket) {
+					MessagePacket joinMessage = (MessagePacket) o;
+					
+					/* New client initiated join */
+					if (joinMessage.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_REQUEST) {
+						String username = joinMessage.playerName;
+						
+						System.err.println("Received GAME JOIN MESSAGE FROM CLIENT : " + username);
+						MessagePacket result = MazewarServer.testAndAcceptClient(username ,this);
+						
+						outputStream.writeObject(result);
+						outputStream.flush();
+						
+						if (result.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS) {
+							this.name = username;
+							this.acceptedClient = true; 
+						
+							/* Is server have enough players? If so, start Game*/
+							System.err.println("Is server Full?");
+							System.err.println(MazewarServer.isFullServer());
+							if (MazewarServer.isFullServer()) {
+								MazewarServer.startGame();
+							}
+						}
+						
+						else {
+							if (result.reason == MessagePacket.ERROR_REASON_PLAYERNAME_EXISTS) {
+								System.err.println("waitAndProcessJoinMessage Rejecting user- Playername Exists:" + username);
+								
+							}
+							else if (result.reason == MessagePacket.ERROR_REASON_SERVER_FULL) {
+								System.err.println("waitAndProcessJoinMessage  Rejecting user - Server Full");
+								inputStream.close();
+								outputStream.close();
+								socket.close();
+								return;
+							}
+							else {
+								System.err.println("waitAndProcessJoinMessage : Unhandled Reason");
+							}
+						}
+					}
+				
+				}
+			} catch (ClassNotFoundException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 	
+	public String getName() {
+		return name;
+	}
 }
