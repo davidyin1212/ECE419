@@ -44,6 +44,7 @@ import java.util.HashMap;
 
 public class MazeImpl extends Maze implements Serializable, ClientListener, Runnable {
 
+		private Collection deadPrj;
         /**
          * Create a {@link Maze}.
          * @param point Treat the {@link Point} as a magintude specifying the
@@ -75,7 +76,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 
                 // Build the maze starting at the corner
                 buildMaze(new Point(0,0));
-
+                deadPrj = new HashSet();
                 thread.start();
         }
        
@@ -335,33 +336,55 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
          * Control loop for {@link Projectile}s.
          */
         public void run() {
-                Collection deadPrj = new HashSet();
-                while(true) {
-                        if(!projectileMap.isEmpty()) {
-                                Iterator it = projectileMap.keySet().iterator();
-                                synchronized(projectileMap) {
-                                        while(it.hasNext()) {   
-                                                Object o = it.next();
-                                                assert(o instanceof Projectile);
-                                                deadPrj.addAll(moveProjectile((Projectile)o));
-                                        }               
-                                        it = deadPrj.iterator();
-                                        while(it.hasNext()) {
-                                                Object o = it.next();
-                                                assert(o instanceof Projectile);
-                                                Projectile prj = (Projectile)o;
-                                                projectileMap.remove(prj);
-                                                clientFired.remove(prj.getOwner());
-                                        }
-                                        deadPrj.clear();
-                                }
-                        }
-                        try {
-                                thread.sleep(200);
-                        } catch(Exception e) {
-                                // shouldn't happen
-                        }
-                }
+
+//                while(true) {
+//                        if(!projectileMap.isEmpty()) {
+//                                Iterator it = projectileMap.keySet().iterator();
+//                                synchronized(projectileMap) {
+//                                        while(it.hasNext()) {   
+//                                                Object o = it.next();
+//                                                assert(o instanceof Projectile);
+//                                                deadPrj.addAll(moveProjectile((Projectile)o));
+//                                        }               
+//                                        it = deadPrj.iterator();
+//                                        while(it.hasNext()) {
+//                                                Object o = it.next();
+//                                                assert(o instanceof Projectile);
+//                                                Projectile prj = (Projectile)o;
+//                                                projectileMap.remove(prj);
+//                                                clientFired.remove(prj.getOwner());
+//                                        }
+//                                        deadPrj.clear();
+//                                }
+//                        }
+//                        try {
+//                                thread.sleep(200);
+//                        } catch(Exception e) {
+//                                // shouldn't happen
+//                        }
+//                }
+        }
+        
+        public void missileTick() {
+        	 if(!projectileMap.isEmpty()) {
+                 Iterator it = projectileMap.keySet().iterator();
+                 synchronized(projectileMap) {
+                         while(it.hasNext()) {   
+                                 Object o = it.next();
+                                 assert(o instanceof Projectile);
+                                 deadPrj.addAll(moveProjectile((Projectile)o));
+                         }               
+                         it = deadPrj.iterator();
+                         while(it.hasNext()) {
+                                 Object o = it.next();
+                                 assert(o instanceof Projectile);
+                                 Projectile prj = (Projectile)o;
+                                 projectileMap.remove(prj);
+                                 clientFired.remove(prj.getOwner());
+                         }
+                         deadPrj.clear();
+                 }
+        	 }
         }
         
         /* Internals */

@@ -43,9 +43,12 @@ public class ClientEventDispatcher implements Runnable{
 				}
 				
 				else {
+					if (msg.messageType == MessagePacket.GAME_MESSAGE_TYPE_PROJECTILE_TICK) {
+						game.missileTick();
+					}
 					
 					/* Is it for GUIClient ?*/
-					if (msg.playerName.equals(game.guiClient.getName())) {
+					else if (msg.playerName.equals(game.guiClient.getName())) {
 						game.guiClient.receiveMessage(msg);
 
 					}

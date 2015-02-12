@@ -47,6 +47,7 @@ public class MessagePacket implements Serializable, Comparable {
 	
 	public static final int GAME_MESSAGE_TYPE_FIRE = 306;
 	
+	public static final int GAME_MESSAGE_TYPE_PROJECTILE_TICK = 307;
 	
 	public static final int ERROR_REASON_PLAYERNAME_EXISTS = 0;
 	public static final int ERROR_REASON_SERVER_FULL = 1;

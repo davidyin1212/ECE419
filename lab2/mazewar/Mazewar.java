@@ -295,6 +295,9 @@ public class Mazewar extends JFrame {
         }
 
         
+        public void missileTick() {
+        	maze.missileTick();
+        }
         
         public void startGame(MessagePacket message) {
 	        	

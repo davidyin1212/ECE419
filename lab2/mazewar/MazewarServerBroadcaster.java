@@ -14,7 +14,7 @@ public class MazewarServerBroadcaster implements Runnable{
 	public void run() {
 		
 		sendStartGameMessage();
-		
+		(new Thread(new ProjectileTickGenerator())).start();
 		while (! Thread.currentThread().isInterrupted()) {
 			if (MazewarServer.hasNextMessage()) {
 				MessagePacket msg = MazewarServer.dequeueMessage();
