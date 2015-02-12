@@ -154,6 +154,10 @@ public class OverheadMazePanel extends JPanel implements MazeListener {
                 // Obtain the location of the distinguished client
                 Point cp = maze.getClientPoint(client);
                 
+                if( cp == null) {
+                	System.out.println("cp is null");
+                	return;
+                }
                 for(int i = 0; i < p.getY(); i++) {
                         for(int j = 0; j < p.getX(); j++) {
                                 boolean cellVisible = true;

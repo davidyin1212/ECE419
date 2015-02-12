@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Random;
 
 
 /*
@@ -14,6 +16,7 @@ public class MazewarClient implements Runnable {
 	public ObjectOutputStream outputStream;
 	private boolean acceptedClient = false;
 	private String name;
+	private static Random randomGen = new Random(System.currentTimeMillis());
 	
 	public MazewarClient(Socket socket) throws IOException {
 		this.socket = socket;
@@ -34,6 +37,17 @@ public class MazewarClient implements Runnable {
 					MessagePacket incomingMsg;
 					try {
 						incomingMsg = (MessagePacket) inputStream.readObject();
+						
+						if (incomingMsg.messageType == MessagePacket.GAME_MESSAGE_TYPE_SPAWN_PLAYER) {
+							
+							Point newLoc = MazeImpl.getRandomPoint(randomGen);
+							incomingMsg.playerLocations = new HashMap<String, Point>();
+							incomingMsg.playerDirections = new HashMap<String, Direction>();
+							incomingMsg.playerLocations.put(name, newLoc);
+							incomingMsg.playerDirections.put(name, Direction.random());
+						}
+						
+						
 						MazewarServer.enqueueMessage(incomingMsg);
 						System.out.println(incomingMsg.toString());
 					} catch (ClassNotFoundException e) {

@@ -97,4 +97,18 @@ public class Point implements Serializable {
         public String toString() {
         	return String.format("Point (%d,%d)", x,y);
         }
+        
+        public static Point getNextPoint(Point point, int maxX, int maxY) {
+        	maxX--;
+        	maxY--;
+        	if (point.x == maxX && point.y == maxY) {
+        		return new Point(0, 0);
+        	}
+        	else if (point.x == maxX) {
+        		return new Point(0, point.y + 1);
+        	}
+        	else {
+        		return new Point(point.x + 1, 0);
+        	}
+        }
 }

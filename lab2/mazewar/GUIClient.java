@@ -29,7 +29,8 @@ import java.awt.event.KeyEvent;
 
 public class GUIClient extends LocalClient implements KeyListener {
 	
-	ClientCommunicator comm;
+	private ClientCommunicator comm;
+	
 	
         /**
          * Create a GUI controlled {@link LocalClient}.  
@@ -106,5 +107,9 @@ public class GUIClient extends LocalClient implements KeyListener {
          */
         public void keyTyped(KeyEvent e) {
         }
+
+		
+
+	
 
 }

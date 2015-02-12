@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.PriorityQueue;
 
 
-public class ClientCommunicator implements Runnable{
+public class ClientCommunicator implements Runnable, MazeListener{
 	
 	Mazewar game;
 	
@@ -138,6 +138,52 @@ public class ClientCommunicator implements Runnable{
 			e.printStackTrace();
 		}
 		
+		
+	}
+
+
+	@Override
+	public void mazeUpdate() {
+		// TODO Auto-generated method stub
+		System.out.println("MazeUp");
+		
+	}
+
+
+	@Override
+	public void clientKilled(Client source, Client target) {
+		System.out.println("Myclient killedd!!!!!");
+		// If GUIClient dies, GUIClient is responsible for sending respawn request
+		if (target instanceof GUIClient) {
+
+			MessagePacket msg= new MessagePacket();
+			msg.messageType = MessagePacket.GAME_MESSAGE_TYPE_SPAWN_PLAYER;
+			msg.playerName = game.guiClient.getName();
+			
+			sendGameMessage(msg);
+		}
+		System.out.println("Myclient killedd!!!!! done");
+	}
+
+
+	@Override
+	public void clientAdded(Client client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void clientFired(Client client) {
+		// TODO Auto-generated method stub
+		System.out.println("clientFired");
+		
+	}
+
+
+	@Override
+	public void clientRemoved(Client client) {
+		// TODO Auto-generated method stub
 		
 	}
 	

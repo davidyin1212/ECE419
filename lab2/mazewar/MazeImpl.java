@@ -181,6 +181,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
         }
        
         
+        
         public boolean checkBounds(Point point) {
                 assert(point != null);
                 return (point.getX() >= 0) && (point.getY() >= 0) && 
@@ -206,7 +207,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                         point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
                         cell = getCellImpl(point);
                 } 
-                addClient(client, point);
+                addClient(client, point, Direction.random());
         }
         
         public synchronized Point getClientPoint(Client client) {
@@ -423,13 +424,13 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
          * @param client The {@link Client} to be added.
          * @param point The location the {@link Client} should be added.
          */
-        public synchronized void addClient(Client client, Point point) {
+        public synchronized void addClient(Client client, Point point, Direction d) {
                 assert(client != null);
                 assert(checkBounds(point));
                 CellImpl cell = getCellImpl(point);
-                Direction d = Direction.random();
+  
                 while(cell.isWall(d)) {
-                  d = Direction.random();
+                  d = Direction.nextDirection(d);
                 }
                 cell.setContents(client);
                 clientMap.put(client, new DirectedPoint(point, d));
@@ -437,6 +438,25 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 client.addClientListener(this);
                 update();
                 notifyClientAdd(client);
+        }
+        
+        public synchronized void spawnClient(Client client, Point point, Direction direction) {
+        	CellImpl cell = getCellImpl(point);
+        	
+        	// Is it possible to put client into given point or direction?
+        	while (cell.getContents() != null) {
+        		cell = getCellImpl(Point.getNextPoint(point, maxX, maxY));
+        	}
+        		
+    		while (cell.isWall(direction)) {
+    			direction = Direction.nextDirection(direction);
+    		}
+        		
+    		cell.setContents(client);
+    		clientMap.put(client,  new DirectedPoint(point, direction));
+    		update();
+
+ 
         }
         
         /**
@@ -454,20 +474,21 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 Point point = (Point)o;
                 CellImpl cell = getCellImpl(point);
                 cell.setContents(null);
+
                 // Pick a random starting point, and check to see if it is already occupied
-                point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
-                cell = getCellImpl(point);
-                // Repeat until we find an empty cell
-                while(cell.getContents() != null) {
-                        point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
-                        cell = getCellImpl(point);
-                }
-                Direction d = Direction.random();
-                while(cell.isWall(d)) {
-                        d = Direction.random();
-                }
-                cell.setContents(target);
-                clientMap.put(target, new DirectedPoint(point, d));
+//                point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
+//                cell = getCellImpl(point);
+//                // Repeat until we find an empty cell
+//                while(cell.getContents() != null) {
+//                        point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
+//                        cell = getCellImpl(point);
+//                }
+//                Direction d = Direction.random();
+//                while(cell.isWall(d)) {
+//                        d = Direction.random();
+//                }
+//                cell.setContents(target);
+                //clientMap.put(target, new DirectedPoint(point, d));
                 update();
                 notifyClientKilled(source, target);
         }
@@ -865,4 +886,6 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 assert(o2 instanceof CellImpl);
                 return (CellImpl)o2;
         }
+        
+        
 }

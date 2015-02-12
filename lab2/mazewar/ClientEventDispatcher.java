@@ -47,7 +47,7 @@ public class ClientEventDispatcher implements Runnable{
 					/* Is it for GUIClient ?*/
 					if (msg.playerName.equals(game.guiClient.getName())) {
 						game.guiClient.receiveMessage(msg);
-						System.err.println("OYOYYOO");
+
 					}
 					/* It's for remote client*/
 					else {

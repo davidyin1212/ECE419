@@ -124,7 +124,7 @@ public abstract class Client {
         }
 
         
-        public void receiveMessage(MessagePacket msg) {
+		public void receiveMessage(MessagePacket msg) {
         	assert(msg.playerName == this.getName());
         	System.out.println("Received Message For:" + msg.playerName);
        
@@ -142,7 +142,8 @@ public abstract class Client {
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_SPAWN_PLAYER:
-        			
+        			System.out.println("received spawn player msg");
+        			spawnPlayer(msg.playerLocations.get(msg.playerName), msg.playerDirections.get(msg.playerName));
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_TURN_LEFT:
@@ -153,9 +154,14 @@ public abstract class Client {
         			turnRight();
         			break;
         		
-        	}
-        	
-        }
+        	}	
+		}
+        
+		public void spawnPlayer(Point point, Direction direction) {
+
+			maze.spawnClient(this, point, direction);
+
+		}
         
         /**
          * Move the client forward.

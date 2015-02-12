@@ -64,7 +64,8 @@ public class MessagePacket implements Serializable, Comparable {
 	public int reason;
 	public String playerName; /* Represents player who sent the message */
 	HashMap<String, Point> playerLocations;
-	public Point point;
+	HashMap<String, Direction> playerDirections;
+
 	
 	public String toString() {
 		return String.format("(MessageType:%d , Reason:%d , seqNo:%d , playerName:%s", messageType, reason, seqNo, playerName);

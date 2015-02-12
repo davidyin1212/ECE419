@@ -33,10 +33,7 @@ public class RemoteClient extends Client {
                 super(name);
         }
 
-        /**
-         * Received message for this remote client
-         */ 
-        public void receivedMessage(MessagePacket msg) {
-        	
-        }
+
+
+
 }

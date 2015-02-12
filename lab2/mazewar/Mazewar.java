@@ -288,6 +288,7 @@ public class Mazewar extends JFrame {
 //                this.requestFocusInWindow();
                 //startGame(null);
                 
+                maze.addMazeListener(cc);
                 (new Thread(eventDispatcher)).start();
                 (new Thread(cc)).start(); 
 
@@ -302,7 +303,7 @@ public class Mazewar extends JFrame {
     		Entry<String, Point> entry;
     		String name;
     		Point point;
-    		
+    		Direction direction;
         	remoteClients = new Vector<RemoteClient>();
         	Iterator<Entry<String, Point>> it = message.playerLocations.entrySet().iterator();
         	
@@ -312,15 +313,16 @@ public class Mazewar extends JFrame {
         		entry = it.next();
         		name = entry.getKey();
         		point = entry.getValue();
+        		direction = message.playerDirections.get(name);
         		
         		/* Is it my GUI client's location? */
         		if (name.equals(guiClient.getName())) {
-        			maze.addClient(guiClient, point);
+        			maze.addClient(guiClient, point, direction);
         		}
         		else {
         			RemoteClient remoteClient = new RemoteClient(name);
         			remoteClients.add(remoteClient);
-        			maze.addClient(remoteClient, point);
+        			maze.addClient(remoteClient, point, direction);
         		}
         	}
         	

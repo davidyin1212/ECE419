@@ -57,9 +57,10 @@ public class MazewarServerBroadcaster implements Runnable{
 
 		Iterator <MazewarClient> it = MazewarServer.getClientIter();
 		startMessage.playerLocations = new HashMap<String, Point>();
+		startMessage.playerDirections = new HashMap<String, Direction>();
 		MazewarClient client = null;
 		Point newLoc;
-		
+		Direction newDirection;
 		/* Determine starting location - Make sure not to include same location among different players */
 		Random randomGen = new Random(System.currentTimeMillis());
 
@@ -67,12 +68,13 @@ public class MazewarServerBroadcaster implements Runnable{
 		while (it.hasNext()) {
 			client = it.next();
 			newLoc = MazeImpl.getRandomPoint(randomGen);
+			newDirection = Direction.random();
 			while (startMessage.playerLocations.containsValue(newLoc)) {
 				newLoc = MazeImpl.getRandomPoint(randomGen);
 			}
 			
 			startMessage.playerLocations.put(client.getName(), newLoc);
-			
+			startMessage.playerDirections.put(client.getName(), newDirection);
 		}
 
 		broadcast(startMessage);
