@@ -87,7 +87,6 @@ public class GUIClient extends LocalClient implements KeyListener {
                     
                     if (isValidKey) {
                     	comm.sendGameMessage(message);
-                    	System.err.println("written message to server");
                     }
                 }
         }

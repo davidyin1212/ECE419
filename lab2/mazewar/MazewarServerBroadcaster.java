@@ -29,8 +29,7 @@ public class MazewarServerBroadcaster implements Runnable{
 		packet.seqNo = MazewarServer.getNextSeqNum();
 		
 		Iterator<MazewarClient> it = MazewarServer.getClientIter();
-		
-		System.err.println("Broadcasting Message " + packet.toString());
+
 		/* Broadcast to all clients*/
 		while (it.hasNext()) {
 			client = it.next();
@@ -47,7 +46,7 @@ public class MazewarServerBroadcaster implements Runnable{
 	
 	public void sendStartGameMessage() {
 		
-		System.err.println("sendStartGameMessage");
+		System.err.println("Starting Game!");
 		
 		/* Setup start message with seqNum 0 */
 		MessagePacket startMessage = new MessagePacket();

@@ -127,7 +127,6 @@ public abstract class Client {
         
 		public void receiveMessage(MessagePacket msg) {
         	assert(msg.playerName == this.getName());
-        	System.out.println("Received Message For:" + msg.playerName);
 
         	switch (msg.messageType) {
         		case MessagePacket.GAME_MESSAGE_TYPE_FIRE :

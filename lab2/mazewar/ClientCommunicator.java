@@ -15,17 +15,15 @@ public class ClientCommunicator implements Runnable, MazeListener{
 	private String hostname; 
 	private boolean isConnected;
 	private Socket clientSocket;
-	
 	private ObjectOutputStream outputStream;
 	private ObjectInputStream inputStream;
-	private PriorityQueue<MessagePacket> orderedMessageQueue;
+
 	
 	public ClientCommunicator(String hostname, int portNumber, Mazewar game) {
 		this.game = game;
 		this.hostname = hostname;
 		this.portNumber = portNumber;
 		this.isConnected = false;
-		orderedMessageQueue = new PriorityQueue<MessagePacket>();
 	}
 
 
@@ -61,13 +59,11 @@ public class ClientCommunicator implements Runnable, MazeListener{
 			/* Upon failure, sleep thread for  3 secs */
 			catch (Exception e) {
 				System.err.println ("Could not connect to server.. will try again in 3 seconds");
-				e.printStackTrace();
-
+				
 				try {
 					Thread.sleep(CONNECT_FAILURE_SLEEP_INTERVAL);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					System.err.println("Thread exception");
 				}
 			}
 		}
@@ -77,18 +73,12 @@ public class ClientCommunicator implements Runnable, MazeListener{
 		try {
 			this.outputStream = new ObjectOutputStream(this.clientSocket.getOutputStream());
 			this.inputStream = new ObjectInputStream(this.clientSocket.getInputStream());
-			
-			System.out.println("opened io stream");
 		} catch (IOException e) {
 			System.err.println("Error while opening I/O Stream");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
-		
-		System.out.println("Initialized Socket and I/O Stream");
-		
 	}
 	 
 	/*
@@ -144,15 +134,11 @@ public class ClientCommunicator implements Runnable, MazeListener{
 
 	@Override
 	public void mazeUpdate() {
-		// TODO Auto-generated method stub
-		System.out.println("MazeUp");
-		
 	}
 
 
 	@Override
 	public void clientKilled(Client source, Client target) {
-		System.out.println("Myclient killedd!!!!!");
 		// If GUIClient dies, GUIClient is responsible for sending respawn request
 		if (target instanceof GUIClient) {
 
@@ -163,29 +149,21 @@ public class ClientCommunicator implements Runnable, MazeListener{
 			sendGameMessage(msg);
 		}
 		target.isAlive = false;
-		System.out.println("Myclient killedd!!!!! done");
 	}
 
 
 	@Override
 	public void clientAdded(Client client) {
-		// TODO Auto-generated method stub
-		
 	}
 
 
 	@Override
 	public void clientFired(Client client) {
-		// TODO Auto-generated method stub
-		System.out.println("clientFired");
-		
 	}
 
 
 	@Override
 	public void clientRemoved(Client client) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	

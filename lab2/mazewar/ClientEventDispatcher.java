@@ -32,6 +32,8 @@ public class ClientEventDispatcher implements Runnable{
 
 	
 	public void run() {
+		
+		System.out.println("Waiting for other players to join...");
 		while (! Thread.currentThread().isInterrupted()) {
 			MessagePacket msg = getNextMessage();
 			

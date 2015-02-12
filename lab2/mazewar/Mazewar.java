@@ -191,33 +191,7 @@ public class Mazewar extends JFrame {
                 	
                 } while (response.messageType != MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS);
                 
-//                (new Thread(eventDispatcher)).start();
-//                (new Thread(cc)).start(); 
-                
-                
-                
-                
-                System.out.println(response.toString());
-                /* Try until successfully registers to Server */
-                // Throw up a dialog to get the GUIClient name.
-                
-
-                // You may want to put your network initialization code somewhere in
-                // here.
-                
-                // Create the GUIClient and connect it to the KeyListener queue
- 	              guiClient = new GUIClient(name, cc);
-//                maze.addClient(guiClient);
-                //this.addKeyListener(guiClient);
-                
-                // Use braces to force constructors not to be called at the beginning of the
-                // constructor.
-//                {
-//                        maze.addClient(new RobotClient("Norby"));
-//                        maze.addClient(new RobotClient("Robbie"));
-//                        maze.addClient(new RobotClient("Clango"));
-//                        maze.addClient(new RobotClient("Marvin"));
-//                }
+                guiClient = new GUIClient(name, cc);
 
                 
                 // Create the panel that will display the maze.
@@ -264,29 +238,6 @@ public class Mazewar extends JFrame {
                 c.gridwidth = GridBagConstraints.REMAINDER;
                 c.weightx = 1.0;
                 layout.setConstraints(scoreScrollPane, c);
-                                
-//                // Add the components
-//                getContentPane().add(overheadPanel); // GameScreen
-//                getContentPane().add(consoleScrollPane);
-//                getContentPane().add(scoreScrollPane);
-//                
-//                // Pack everything neatly.
-//                pack();
-                //-----------
-//              maze.addClient(new RobotClient("Norby"));
-//              maze.addClient(new RobotClient("Robbie"));
-//              maze.addClient(new RobotClient("Clango"));
-//              maze.addClient(new RobotClient("Marvin"));
-//              maze.addClient(guiClient);
-//              this.addKeyListener(guiClient);
-//              
-//              getContentPane().add(overheadPanel);
-                //------------
- //               // Let the magic begin.
-//                setVisible(true);
-//                overheadPanel.repaint();
-//                this.requestFocusInWindow();
-                //startGame(null);
                 
                 maze.addMazeListener(cc);
                 (new Thread(eventDispatcher)).start();
@@ -329,15 +280,6 @@ public class Mazewar extends JFrame {
         		}
         	}
         	
-	    	// add clients here
-//	        maze.addClient(new RobotClient("Norby"));
-//	        maze.addClient(new RobotClient("Robbie"));
-//	        maze.addClient(new RobotClient("Clango"));
-//	        maze.addClient(new RobotClient("Marvin"));
-//	
-//	      
-//	        maze.addClient(guiClient);
-        	
 	        this.addKeyListener(guiClient);
 	        	
 	        // Add the components
@@ -351,6 +293,8 @@ public class Mazewar extends JFrame {
 	        setVisible(true);
 	        overheadPanel.repaint();
 	        this.requestFocusInWindow();
+	        
+	        System.out.println("Game has begun");
         }
         
         /**

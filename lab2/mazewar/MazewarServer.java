@@ -10,14 +10,14 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-
+/*
+ * Centralized server for Mazewar
+ */
 public class MazewarServer {
+	
 	private static int portNumber;
 	private static Vector<MazewarClient> clients; /* Vector containing worker per client*/
 	private static ServerSocket serverSocket;
-	private static PrintWriter out;
-	private static BufferedReader in;
-	private static BufferedReader stdIn;
 	private static int nextSeqNum;
 	private static int maxClients;
 	private static boolean gameStarted;
@@ -74,14 +74,14 @@ public class MazewarServer {
 			System.exit(1);
 		}
 		
+		System.err.println("Waiting for clients' connection");
 		/* Accept Clients, spawn thread as delegate */
 		while (true) {
 			try {
 				MazewarClient worker;
 				/* Accept Incoming connection */
-				System.err.println("Waiting for clients' connection");
+				
 				worker = new MazewarClient(serverSocket.accept());
-				System.err.println("Accepted Client");
 				
 				/* Start worker thread */
 				(new Thread(worker)).start(); 

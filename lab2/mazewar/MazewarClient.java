@@ -26,9 +26,6 @@ public class MazewarClient implements Runnable {
 	}
 	
 	public void run() {		
-		
-		System.out.println("Thread Started");
-
 		waitAndProcessJoinMessage();
 		
 		if (acceptedClient) {
@@ -49,20 +46,20 @@ public class MazewarClient implements Runnable {
 						
 						
 						MazewarServer.enqueueMessage(incomingMsg);
-						System.out.println(incomingMsg.toString());
+
 					} catch (ClassNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						break;
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.err.println("Client closed connection");
+						break;
 					}
 					
 	
 				
 			}
 		}
-		System.out.println("Disposing Thread");
 				
 	}
 	
@@ -78,8 +75,6 @@ public class MazewarClient implements Runnable {
 					/* New client initiated join */
 					if (joinMessage.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_REQUEST) {
 						String username = joinMessage.playerName;
-						
-						System.err.println("Received GAME JOIN MESSAGE FROM CLIENT : " + username);
 						MessagePacket result = MazewarServer.testAndAcceptClient(username ,this);
 						
 						outputStream.writeObject(result);
@@ -88,10 +83,8 @@ public class MazewarClient implements Runnable {
 						if (result.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS) {
 							this.name = username;
 							this.acceptedClient = true; 
-						
+							System.out.println(username + " successfully joined the game");
 							/* Is server have enough players? If so, start Game*/
-							System.err.println("Is server Full?");
-							System.err.println(MazewarServer.isFullServer());
 							if (MazewarServer.isFullServer()) {
 								MazewarServer.startGame();
 							}
@@ -119,8 +112,10 @@ public class MazewarClient implements Runnable {
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				return;
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("Client closed connection");
+				return;
 			}
 			
 		}

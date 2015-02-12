@@ -155,7 +155,6 @@ public class OverheadMazePanel extends JPanel implements MazeListener {
                 Point cp = maze.getClientPoint(client);
                 
                 if( cp == null) {
-                	System.out.println("cp is null");
                 	return;
                 }
                 for(int i = 0; i < p.getY(); i++) {
