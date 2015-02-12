@@ -114,7 +114,8 @@ public abstract class Client {
          */
         private String name = null;
        
-
+        public boolean isAlive = true;
+        
         /** 
          * Create a new client with the specified name.
          */
@@ -127,34 +128,35 @@ public abstract class Client {
 		public void receiveMessage(MessagePacket msg) {
         	assert(msg.playerName == this.getName());
         	System.out.println("Received Message For:" + msg.playerName);
-       
+
         	switch (msg.messageType) {
         		case MessagePacket.GAME_MESSAGE_TYPE_FIRE :
-        			fire();
+        			if (isAlive) fire();
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_MOVE_PLAYER_BACKWARD:
-        			backup();
+        			if (isAlive) backup();
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD:
-        			forward();
+        			if (isAlive) forward();
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_SPAWN_PLAYER:
-        			System.out.println("received spawn player msg");
+        			
         			spawnPlayer(msg.playerLocations.get(msg.playerName), msg.playerDirections.get(msg.playerName));
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_TURN_LEFT:
-        			turnLeft();
+        			if (isAlive) turnLeft();
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_TURN_RIGHT:
-        			turnRight();
+        			if (isAlive) turnRight();
         			break;
         		
         	}	
+        	
 		}
         
 		public void spawnPlayer(Point point, Direction direction) {

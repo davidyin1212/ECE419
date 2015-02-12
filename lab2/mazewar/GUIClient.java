@@ -50,12 +50,13 @@ public class GUIClient extends LocalClient implements KeyListener {
         		message.playerName = this.getName();
         		
         		boolean isValidKey = true;
+        		
                 // If the user pressed Q, invoke the cleanup code and quit. 
                 if((e.getKeyChar() == 'q') || (e.getKeyChar() == 'Q')) {
                         Mazewar.quit();     
                 }
                 
-                else {
+                else if (this.isAlive) {
                 	// Up-arrow moves forward.
                     if(e.getKeyCode() == KeyEvent.VK_UP) {
                 		message.messageType = MessagePacket.GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD;
@@ -83,12 +84,11 @@ public class GUIClient extends LocalClient implements KeyListener {
 	                else {
 	                	isValidKey = false;
 	                }
-                }
-                
-
-                if (isValidKey) {
-                	comm.sendGameMessage(message);
-                	System.err.println("written message to server");
+                    
+                    if (isValidKey) {
+                    	comm.sendGameMessage(message);
+                    	System.err.println("written message to server");
+                    }
                 }
         }
         

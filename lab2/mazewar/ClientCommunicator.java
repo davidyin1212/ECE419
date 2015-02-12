@@ -162,6 +162,7 @@ public class ClientCommunicator implements Runnable, MazeListener{
 			
 			sendGameMessage(msg);
 		}
+		target.isAlive = false;
 		System.out.println("Myclient killedd!!!!! done");
 	}
 

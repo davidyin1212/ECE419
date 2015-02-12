@@ -474,9 +474,10 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
     		while (cell.isWall(direction)) {
     			direction = Direction.nextDirection(direction);
     		}
-        		
+        	
     		cell.setContents(client);
     		clientMap.put(client,  new DirectedPoint(point, direction));
+    		client.isAlive = true;
     		update();
 
  

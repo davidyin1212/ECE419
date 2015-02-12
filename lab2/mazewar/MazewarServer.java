@@ -56,7 +56,6 @@ public class MazewarServer {
 	private static void serverInit() {
 		clients = new Vector<MazewarClient>();
 		nextSeqNum = 0;
-		maxClients = 2;
 		gameStarted = false;
 		messageQueue = new ConcurrentLinkedQueue<MessagePacket>();
 	}
@@ -134,13 +133,19 @@ public class MazewarServer {
 	
 	public static void main(String [ ] args)
 	{
+		maxClients = 4;
 		
-		if (args.length != 1) {
-			System.err.println("Usage: java MazewarServer <port number>");
+		if (args.length < 1 || args.length > 2) {
+			System.err.println("Usage: java MazewarServer <port number> [MAX_NUM_PLAYER]");
 			System.exit(1);
 		}
 		
 		portNumber = Integer.parseInt(args[0]);
+		
+		if (args.length == 2) {
+			maxClients = Integer.parseInt(args[1]);
+		}
+		
 		startServer();
 		
 	
