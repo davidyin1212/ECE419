@@ -30,13 +30,20 @@ public class MazewarClient implements Runnable {
 		
 		if (acceptedClient) {
 			while (! Thread.currentThread().isInterrupted()) {
-				try {
-					MessagePacket incomingMsg = (MessagePacket) inputStream.readObject();
-					MazewarServer.enqueueMessage(incomingMsg);
-				} catch (ClassNotFoundException | IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		
+					MessagePacket incomingMsg;
+					try {
+						incomingMsg = (MessagePacket) inputStream.readObject();
+						MazewarServer.enqueueMessage(incomingMsg);
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+	
 				
 			}
 		}
@@ -94,10 +101,13 @@ public class MazewarClient implements Runnable {
 					}
 				
 				}
-			} catch (ClassNotFoundException | IOException e) {
+			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+			
 		}
 	}
 	

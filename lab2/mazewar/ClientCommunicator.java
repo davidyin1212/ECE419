@@ -2,9 +2,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.PriorityQueue;
 
 
 public class ClientCommunicator implements Runnable{
+	
+	Mazewar game;
+	
 	private final int CONNECT_FAILURE_SLEEP_INTERVAL = 3000;
 	
 	private int portNumber;
@@ -14,25 +18,34 @@ public class ClientCommunicator implements Runnable{
 	
 	private ObjectOutputStream outputStream;
 	private ObjectInputStream inputStream;
+	private PriorityQueue<MessagePacket> orderedMessageQueue;
 	
-	public ClientCommunicator(String hostname, int portNumber) {
+	public ClientCommunicator(String hostname, int portNumber, Mazewar game) {
+		this.game = game;
 		this.hostname = hostname;
 		this.portNumber = portNumber;
 		this.isConnected = false;
+		orderedMessageQueue = new PriorityQueue<MessagePacket>();
 	}
 
 
 	@Override
 	public void run() {
 		while (! Thread.currentThread().isInterrupted()) {
-			MessagePacket msg;
-			try {
-				msg = (MessagePacket) inputStream.readObject();
-				System.out.println(msg.toString());
-			} catch (ClassNotFoundException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			MessagePacket msg = null;
+			
+				try {
+					msg = (MessagePacket) inputStream.readObject();
+					assert(msg != null);
+					ClientEventDispatcher.addMessage(msg);
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			
 		}
 	}

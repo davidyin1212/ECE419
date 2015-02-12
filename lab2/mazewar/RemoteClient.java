@@ -34,6 +34,9 @@ public class RemoteClient extends Client {
         }
 
         /**
-         * May want to fill in code here.
+         * Received message for this remote client
          */ 
+        public void receivedMessage(MessagePacket msg) {
+        	
+        }
 }

@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JOptionPane;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
@@ -31,6 +32,10 @@ import javax.swing.BorderFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.PriorityQueue;
+import java.util.Vector;
 
 /**
  * The entry point and glue code for the game.  It also contains some helpful
@@ -66,7 +71,9 @@ public class Mazewar extends JFrame {
         /**
          * The {@link GUIClient} for the game.
          */
-        private GUIClient guiClient = null;
+        public  GUIClient guiClient = null;
+        
+        public Vector<RemoteClient> remoteClients = null;
 
         /**
          * The panel that displays the {@link Maze}.
@@ -78,6 +85,9 @@ public class Mazewar extends JFrame {
          */
         private JTable scoreTable = null;
         
+        private JScrollPane consoleScrollPane;
+        
+        private JScrollPane scoreScrollPane;
         /** 
          * Create the textpane statically so that we can 
          * write to it globally using
@@ -85,6 +95,7 @@ public class Mazewar extends JFrame {
          */
         private static final JTextPane console = new JTextPane();
       
+
         /** 
          * Write a message to the console followed by a newline.
          * @param msg The {@link String} to print.
@@ -138,9 +149,12 @@ public class Mazewar extends JFrame {
                 assert(scoreModel != null);
                 maze.addMazeListener(scoreModel);
                 
-                // Init Mazewar Client
                 
-                ClientCommunicator cc = new ClientCommunicator(hostname, portNumb);
+                
+                /*Init Client Commmunicator and Event Dispatcher */
+                ClientCommunicator cc = new ClientCommunicator(hostname, portNumb, this);
+                ClientEventDispatcher eventDispatcher = new ClientEventDispatcher(this);
+
                 cc.connectToServer();
 
                 /* Send Join Request to server. 
@@ -177,7 +191,9 @@ public class Mazewar extends JFrame {
                 	
                 } while (response.messageType != MessagePacket.ADMIN_MESSAGE_TYPE_JOIN_GAME_SUCCESS);
                 
-                (new Thread(cc)).start(); 
+//                (new Thread(eventDispatcher)).start();
+//                (new Thread(cc)).start(); 
+                
                 
                 
                 
@@ -190,9 +206,9 @@ public class Mazewar extends JFrame {
                 // here.
                 
                 // Create the GUIClient and connect it to the KeyListener queue
-                guiClient = new GUIClient(name);
-                maze.addClient(guiClient);
-                this.addKeyListener(guiClient);
+ 	              guiClient = new GUIClient(name);
+//                maze.addClient(guiClient);
+                //this.addKeyListener(guiClient);
                 
                 // Use braces to force constructors not to be called at the beginning of the
                 // constructor.
@@ -215,7 +231,7 @@ public class Mazewar extends JFrame {
                 console.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder()));
                
                 // Allow the console to scroll by putting it in a scrollpane
-                JScrollPane consoleScrollPane = new JScrollPane(console);
+                consoleScrollPane = new JScrollPane(console);
                 assert(consoleScrollPane != null);
                 consoleScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Console"));
                 
@@ -226,7 +242,7 @@ public class Mazewar extends JFrame {
                 scoreTable.setRowSelectionAllowed(false);
 
                 // Allow the score table to scroll too.
-                JScrollPane scoreScrollPane = new JScrollPane(scoreTable);
+                scoreScrollPane = new JScrollPane(scoreTable);
                 assert(scoreScrollPane != null);
                 scoreScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Scores"));
                 
@@ -249,21 +265,88 @@ public class Mazewar extends JFrame {
                 c.weightx = 1.0;
                 layout.setConstraints(scoreScrollPane, c);
                                 
-                // Add the components
-                getContentPane().add(overheadPanel);
-                getContentPane().add(consoleScrollPane);
-                getContentPane().add(scoreScrollPane);
+//                // Add the components
+//                getContentPane().add(overheadPanel); // GameScreen
+//                getContentPane().add(consoleScrollPane);
+//                getContentPane().add(scoreScrollPane);
+//                
+//                // Pack everything neatly.
+//                pack();
+                //-----------
+//              maze.addClient(new RobotClient("Norby"));
+//              maze.addClient(new RobotClient("Robbie"));
+//              maze.addClient(new RobotClient("Clango"));
+//              maze.addClient(new RobotClient("Marvin"));
+//              maze.addClient(guiClient);
+//              this.addKeyListener(guiClient);
+//              
+//              getContentPane().add(overheadPanel);
+                //------------
+ //               // Let the magic begin.
+//                setVisible(true);
+//                overheadPanel.repaint();
+//                this.requestFocusInWindow();
+                //startGame(null);
                 
-                // Pack everything neatly.
-                pack();
-
-                // Let the magic begin.
-                setVisible(true);
-                overheadPanel.repaint();
-                this.requestFocusInWindow();
+                (new Thread(eventDispatcher)).start();
+                (new Thread(cc)).start(); 
 
         }
 
+        
+        
+        public void startGame(MessagePacket message) {
+	        	
+        	assert (message.messageType == MessagePacket.ADMIN_MESSAGE_TYPE_GAME_START);
+        	
+    		Entry<String, Point> entry;
+    		String name;
+    		Point point;
+    		
+        	remoteClients = new Vector<RemoteClient>();
+        	Iterator<Entry<String, Point>> it = message.playerLocations.entrySet().iterator();
+        	
+        	/* Add clients to game*/
+        	while (it.hasNext()) {
+        		
+        		entry = it.next();
+        		name = entry.getKey();
+        		point = entry.getValue();
+        		
+        		/* Is it my GUI client's location? */
+        		if (name.equals(guiClient.getName())) {
+        			maze.addClient(guiClient, point);
+        		}
+        		else {
+        			RemoteClient remoteClient = new RemoteClient(name);
+        			remoteClients.add(remoteClient);
+        			maze.addClient(remoteClient, point);
+        		}
+        	}
+        	
+	    	// add clients here
+//	        maze.addClient(new RobotClient("Norby"));
+//	        maze.addClient(new RobotClient("Robbie"));
+//	        maze.addClient(new RobotClient("Clango"));
+//	        maze.addClient(new RobotClient("Marvin"));
+//	
+//	      
+//	        maze.addClient(guiClient);
+        	
+	        this.addKeyListener(guiClient);
+	        	
+	        // Add the components
+	        getContentPane().add(overheadPanel); // GameScreen
+	        getContentPane().add(consoleScrollPane);
+	        getContentPane().add(scoreScrollPane);
+	        
+	        // Pack everything neatly.
+	        pack();
+	        
+	        setVisible(true);
+	        overheadPanel.repaint();
+	        this.requestFocusInWindow();
+        }
         
         /**
          * Entry point for the game.  

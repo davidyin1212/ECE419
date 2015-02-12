@@ -58,6 +58,7 @@ public abstract class Maze {
      */
     public abstract void addClient(Client client);
 
+    public abstract void addClient(Client client, Point point);
     /** 
      * Create a new {@link Projectile} from the specified {@link Client}
      * @param client {@link Client} that is firing.

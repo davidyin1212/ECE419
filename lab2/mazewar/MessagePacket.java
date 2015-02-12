@@ -2,7 +2,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 
-public class MessagePacket implements Serializable {
+public class MessagePacket implements Serializable, Comparable {
 	
 	
 	/* -------------------- MESSAGE TYPES --------------------- */
@@ -68,6 +68,27 @@ public class MessagePacket implements Serializable {
 	
 	public String toString() {
 		return String.format("(MessageType:%d , Reason:%d , seqNo:%d , playerName:%s", messageType, reason, seqNo, playerName);
+		
+	}
+
+	@Override
+	/* Compare priority => Lower sequence number, higher priority*/
+	public int compareTo(Object o) {
+		if (! (o instanceof MessagePacket)) {
+			throw new IllegalArgumentException("Given object is not instance of MessagePacket.");
+		}
+		
+		MessagePacket otherMsg = (MessagePacket) o;
+		
+		if (this.seqNo == otherMsg.seqNo) {
+			return 0;
+		}
+		else if (this.seqNo < otherMsg.seqNo) {
+			return -1;
+		}
+		else {
+			return 1;
+		}
 		
 	}
 

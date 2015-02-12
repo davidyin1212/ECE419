@@ -126,6 +126,39 @@ public abstract class Client {
                 this.name = name;
         }
 
+        
+        public void receiveMessage(MessagePacket msg) {
+        	assert(msg.playerName == this.getName());
+        	
+        	switch (msg.messageType) {
+        		case MessagePacket.GAME_MESSAGE_TYPE_FIRE :
+        			
+        			break;
+        			
+        		case MessagePacket.GAME_MESSAGE_TYPE_MOVE_PLAYER_BACKWARD:
+        			
+        			break;
+        			
+        		case MessagePacket.GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD:
+        			
+        			break;
+        			
+        		case MessagePacket.GAME_MESSAGE_TYPE_SPAWN_PLAYER:
+        			
+        			break;
+        			
+        		case MessagePacket.GAME_MESSAGE_TYPE_TURN_LEFT:
+        			
+        			break;
+        			
+        		case MessagePacket.GAME_MESSAGE_TYPE_TURN_RIGHT:
+        			
+        			break;
+        		
+        	}
+        	
+        }
+        
         /**
          * Move the client forward.
          * @return <code>true</code> if move was successful, otherwise <code>false</code>.
@@ -190,6 +223,7 @@ public abstract class Client {
          * Notify listeners that the client moved forward.
          */
         private void notifyMoveForward() {
+        		//System.out.println("Forward");
                 notifyListeners(ClientEvent.moveForward);
         }
         
