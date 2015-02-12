@@ -12,6 +12,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 /*
  * Centralized server for Mazewar
+ * 
+ * Responsible for initial server setup and accepting clients.
+ * Clients will be rejected if game already has begun
  */
 public class MazewarServer {
 	

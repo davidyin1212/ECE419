@@ -7,7 +7,11 @@ import java.util.Random;
 
 
 /*
- * MazewarClient from server's point of view
+ * Mazewar client from server's point of view.
+ * Each MazewarClient object represents client connected to server
+ * 
+ * Responsible for reading game messages from client socket and delegating 
+ * message to MazewarServer
  */
 public class MazewarClient implements Runnable {
 

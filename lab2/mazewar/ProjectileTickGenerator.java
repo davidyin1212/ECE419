@@ -1,8 +1,11 @@
 
+/*
+ * ProjectileTickGenerator for synchronizing projectile
+ * This thread adds PROJECTILE_TICK game message to 
+ * message queue every 200 miliseconds.
+ */
 public class ProjectileTickGenerator implements Runnable {
 
-	
-	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub

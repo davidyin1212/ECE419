@@ -1,7 +1,12 @@
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-
+/*
+ * Buffers messages from server using priority queue to meet 
+ * MessagePackets' sequence.
+ * If message's sequence number meets our expectation(by nextMsgSeqNo),
+ * dequeues from the queue and delegated to relevant client.
+ */
 public class ClientEventDispatcher implements Runnable{
 	
 	private static PriorityQueue<MessagePacket> orderedMessageQueue = new PriorityQueue<MessagePacket>();

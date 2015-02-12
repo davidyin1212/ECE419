@@ -4,7 +4,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.PriorityQueue;
 
-
+/*
+ * Client communicator handles sending/receiving MessagePackets
+ * Upon receiving MessagePacket message is delegated to 
+ * ClientEventDispatcher
+ */
 public class ClientCommunicator implements Runnable, MazeListener{
 	
 	Mazewar game;

@@ -1,8 +1,11 @@
 import java.io.Serializable;
 import java.util.HashMap;
 
-
-public class MessagePacket implements Serializable, Comparable {
+/*
+ * Serializable MessagePacket for client/server communication
+ * Comparable based on priority; lower sequence number has higher priority
+ */
+public class MessagePacket implements Serializable, Comparable<MessagePacket> {
 	
 	
 	/* -------------------- MESSAGE TYPES --------------------- */
@@ -75,7 +78,7 @@ public class MessagePacket implements Serializable, Comparable {
 
 	@Override
 	/* Compare priority => Lower sequence number, higher priority*/
-	public int compareTo(Object o) {
+	public int compareTo(MessagePacket o) {
 		if (! (o instanceof MessagePacket)) {
 			throw new IllegalArgumentException("Given object is not instance of MessagePacket.");
 		}
