@@ -114,10 +114,7 @@ public abstract class Client {
          */
         private String name = null;
        
-        /**
-         * clientID given from server
-         */
-        private int clientID = -1;
+
         /** 
          * Create a new client with the specified name.
          */
@@ -129,18 +126,19 @@ public abstract class Client {
         
         public void receiveMessage(MessagePacket msg) {
         	assert(msg.playerName == this.getName());
-        	
+        	System.out.println("Received Message For:" + msg.playerName);
+       
         	switch (msg.messageType) {
         		case MessagePacket.GAME_MESSAGE_TYPE_FIRE :
-        			
+        			fire();
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_MOVE_PLAYER_BACKWARD:
-        			
+        			backup();
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD:
-        			
+        			forward();
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_SPAWN_PLAYER:
@@ -148,11 +146,11 @@ public abstract class Client {
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_TURN_LEFT:
-        			
+        			turnLeft();
         			break;
         			
         		case MessagePacket.GAME_MESSAGE_TYPE_TURN_RIGHT:
-        			
+        			turnRight();
         			break;
         		
         	}

@@ -43,9 +43,11 @@ public class ClientEventDispatcher implements Runnable{
 				}
 				
 				else {
+					
 					/* Is it for GUIClient ?*/
-					if (msg.playerName == game.guiClient.getName()) {
+					if (msg.playerName.equals(game.guiClient.getName())) {
 						game.guiClient.receiveMessage(msg);
+						System.err.println("OYOYYOO");
 					}
 					/* It's for remote client*/
 					else {
@@ -57,7 +59,7 @@ public class ClientEventDispatcher implements Runnable{
 								rc.receiveMessage(msg);
 							}
 						}
-						System.err.println("Cannot find target for message -- You should never see this message.");
+						
 					}
 				}
 			}

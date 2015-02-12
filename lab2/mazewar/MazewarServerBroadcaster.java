@@ -25,8 +25,12 @@ public class MazewarServerBroadcaster implements Runnable{
 
 	private void broadcast(MessagePacket packet) {
 		MazewarClient client;
+		
+		packet.seqNo = MazewarServer.getNextSeqNum();
+		
 		Iterator<MazewarClient> it = MazewarServer.getClientIter();
 		
+		System.err.println("Broadcasting Message " + packet.toString());
 		/* Broadcast to all clients*/
 		while (it.hasNext()) {
 			client = it.next();
@@ -49,7 +53,6 @@ public class MazewarServerBroadcaster implements Runnable{
 		MessagePacket startMessage = new MessagePacket();
 		
 		startMessage.messageType = MessagePacket.ADMIN_MESSAGE_TYPE_GAME_START;
-		startMessage.seqNo = MazewarServer.getNextSeqNum();
 		assert(startMessage.seqNo == 0);
 
 		Iterator <MazewarClient> it = MazewarServer.getClientIter();

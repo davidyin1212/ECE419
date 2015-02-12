@@ -28,12 +28,15 @@ import java.awt.event.KeyEvent;
  */
 
 public class GUIClient extends LocalClient implements KeyListener {
-
+	
+	ClientCommunicator comm;
+	
         /**
          * Create a GUI controlled {@link LocalClient}.  
          */
-        public GUIClient(String name) {
+        public GUIClient(String name, ClientCommunicator comm) {
                 super(name);
+                this.comm = comm;
         }
         
         /**
@@ -41,26 +44,54 @@ public class GUIClient extends LocalClient implements KeyListener {
          * @param e The {@link KeyEvent} that occurred.
          */
         public void keyPressed(KeyEvent e) {
+        	
+        		MessagePacket message = new MessagePacket();
+        		message.playerName = this.getName();
+        		
+        		boolean isValidKey = true;
                 // If the user pressed Q, invoke the cleanup code and quit. 
                 if((e.getKeyChar() == 'q') || (e.getKeyChar() == 'Q')) {
-                        Mazewar.quit();
-                // Up-arrow moves forward.
-                } else if(e.getKeyCode() == KeyEvent.VK_UP) {
-                        forward();
-                // Down-arrow moves backward.
-                } else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
-                        backup();
-                // Left-arrow turns left.
-                } else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-                        turnLeft();
-                // Right-arrow turns right.
-                } else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                        turnRight();
-                // Spacebar fires.
-                } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-                        fire();
+                        Mazewar.quit();     
+                }
+                
+                else {
+                	// Up-arrow moves forward.
+                    if(e.getKeyCode() == KeyEvent.VK_UP) {
+                		message.messageType = MessagePacket.GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD;
+                		
+                        //forward();
+                
+                		// Down-arrow moves backward.
+	                } else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+	                		message.messageType = MessagePacket.GAME_MESSAGE_TYPE_MOVE_PLAYER_BACKWARD;
+	                        //backup();
+	                // Left-arrow turns left.
+	                } else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+	                        message.messageType = MessagePacket.GAME_MESSAGE_TYPE_TURN_LEFT;
+	                        //turnLeft();
+	                        
+	                // Right-arrow turns right.
+	                } else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+	                		message.messageType = MessagePacket.GAME_MESSAGE_TYPE_TURN_RIGHT;
+	                        //turnRight();
+	                // Spacebar fires.
+	                } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+	                		message.messageType = MessagePacket.GAME_MESSAGE_TYPE_FIRE;
+	                        //fire();
+	                }
+	                else {
+	                	isValidKey = false;
+	                }
+                }
+                
+
+                if (isValidKey) {
+                	comm.sendGameMessage(message);
+                	System.err.println("written message to server");
                 }
         }
+        
+
         
         /**
          * Handle a key release. Not needed by {@link GUIClient}.

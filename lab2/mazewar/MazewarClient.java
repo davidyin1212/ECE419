@@ -35,6 +35,7 @@ public class MazewarClient implements Runnable {
 					try {
 						incomingMsg = (MessagePacket) inputStream.readObject();
 						MazewarServer.enqueueMessage(incomingMsg);
+						System.out.println(incomingMsg.toString());
 					} catch (ClassNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

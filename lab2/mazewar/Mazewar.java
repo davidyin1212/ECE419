@@ -206,7 +206,7 @@ public class Mazewar extends JFrame {
                 // here.
                 
                 // Create the GUIClient and connect it to the KeyListener queue
- 	              guiClient = new GUIClient(name);
+ 	              guiClient = new GUIClient(name, cc);
 //                maze.addClient(guiClient);
                 //this.addKeyListener(guiClient);
                 

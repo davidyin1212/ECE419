@@ -45,8 +45,6 @@ public class ClientCommunicator implements Runnable{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-			
 		}
 	}
 	
@@ -129,6 +127,18 @@ public class ClientCommunicator implements Runnable{
 		}
 		
 		return null;
+	}
+	
+	public void sendGameMessage(MessagePacket msg) {
+		try {
+			this.outputStream.writeObject(msg);
+			this.outputStream.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 	
 	
