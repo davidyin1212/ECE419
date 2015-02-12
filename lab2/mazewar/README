@@ -1,0 +1,57 @@
+========================== ECE 419 Lab 2 ==========================
+Team Members
+First Name: Yong Ro		Last Name: Park 		Student#: 997011816
+First Name: David		Last Name: Yin			Student#: 998270767
+
+
+==================== How to Run in UG Lab =========================
+Step1: Run makefile
+
+make
+
+
+Step2: Run MazewarServer
+Note that our MazewarServer takes 1 mandatory argument and 1 optional
+argument as following:
+	java MazewarServer PORT_NUMBER [NUM_PLAYERS]
+
+If NUM_PLAYERS is not provided, by default it is set to 4 people.
+
+
+Step3: Run Mazewar (client)
+
+	java Mazewar HOST_NAME PORT_NUMBER
+
+Note 
+	1) If server is not running client will prompt you with following
+		message and retries to connect to server every 3 seconds
+		
+		$ java Mazewar localhost 11816
+		Trying to connect to server...
+		Could not connect to server.. will try again in 3 seconds
+		Could not connect to server.. will try again in 3 seconds
+
+	2) If server doesn't have number of required players yet, 
+	 	you will be prompted with following message
+
+	 	$ java Mazewar localhost 11816
+		Trying to connect to server...
+		Waiting for other players to join...
+
+	3) Upon providing existing username when joining game,
+		the client will be asked to provide with other username.
+
+Step4: Enjoy the game!
+
+
+==================== What we have done ========================
+We have completed everything as guided in Lab 2 handout.
+Dynamic joins/leavings are not yet implemented as it's not
+requirement for Lab 2 yet. We are willing to implement this 
+feature on next phase.
+
+
+
+
+
+
