@@ -26,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ConcurrentModificationException;
 import java.util.Random;
 import java.util.Vector;  
 import java.util.Map;
@@ -334,12 +335,16 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 Collection deadPrj = new HashSet();
                 while(true) {
                         if(!projectileMap.isEmpty()) {
+                        	try {
                                 Iterator it = projectileMap.keySet().iterator();
                                 synchronized(projectileMap) {
                                         while(it.hasNext()) {   
                                                 Object o = it.next();
                                                 assert(o instanceof Projectile);
-                                                deadPrj.addAll(moveProjectile((Projectile)o));
+                                                // if this projectile hasn't already  been destroyed by another
+                                                if (((Projectile)o).remove_flag == false)
+                                                    deadPrj.addAll(moveProjectile((Projectile)o));
+                                                
                                         }               
                                         it = deadPrj.iterator();
                                         while(it.hasNext()) {
@@ -351,6 +356,11 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                                         }
                                         deadPrj.clear();
                                 }
+                        	}
+                        	catch (ConcurrentModificationException cme) {
+                        		// Will not handle this 
+                        	}
+
                         }
                         try {
                                 thread.sleep(200);
@@ -375,6 +385,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 /* Check for a wall */
                 if(cell.isWall(d)) {
                         // If there is a wall, the projectile goes away.
+                		prj.remove_flag = true;
                         cell.setContents(null);
                         deadPrj.add(prj);
                         update();
@@ -388,8 +399,10 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 CellImpl newCell = getCellImpl(newPoint);
                 Object contents = newCell.getContents();
                 if(contents != null) {
+                		prj.remove_flag = true;
                         // If it is a Client, kill it outright
                         if(contents instanceof Client) {
+                        		
                                 killClient(prj.getOwner(), (Client)contents);
                                 cell.setContents(null);
                                 deadPrj.add(prj);

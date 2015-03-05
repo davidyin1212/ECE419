@@ -29,7 +29,7 @@ public class Projectile {
          * The {@link Client} that owns this {@link Projectile}.
          */
         private final Client owner;
-        
+        public boolean remove_flag;
         /**
          * Create a new {@link Projectile} owned by the specified
          * {@link Client}.
@@ -38,6 +38,7 @@ public class Projectile {
         public Projectile(Client client) {
                 assert(client != null);
                 this.owner = client;
+                this.remove_flag = false;
         }
 
         /**
