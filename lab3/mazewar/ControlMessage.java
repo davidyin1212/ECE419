@@ -1,8 +1,9 @@
-import java.net.InetAddress;
+import java.io.Serializable;
 import java.util.Vector;
 
 
-public class ControlMessage {
+public class ControlMessage implements Serializable {
+
 
 	/* Messages to naming server to join games */
 	public static final int JOIN_GAME_REQUEST = 100;
@@ -16,6 +17,8 @@ public class ControlMessage {
 	
 	Vector<ClientInfo> clients; /* Other clients' info - filled in by server */
 	
-	
+	public ControlMessage() {
+		myInfo = new ClientInfo();
+	}
 	
 }

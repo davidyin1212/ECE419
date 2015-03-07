@@ -23,10 +23,16 @@ import javax.swing.JTextPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JOptionPane;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+
 import javax.swing.BorderFactory;
+
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.Socket;
 
 /**
  * The entry point and glue code for the game.  It also contains some helpful
@@ -37,6 +43,11 @@ import java.io.Serializable;
 
 public class Mazewar extends JFrame {
 
+		private static String namingServerHostName;
+		private static int namingServerPortNo;
+		
+		private ClientCommManager commManager;
+		
         /**
          * The default width of the {@link Maze}.
          */
@@ -127,17 +138,91 @@ public class Mazewar extends JFrame {
                 maze = new MazeImpl(new Point(mazeWidth, mazeHeight), mazeSeed);
                 assert(maze != null);
                 
+                // Create communication Manager
+                commManager = new ClientCommManager();
+                
                 // Have the ScoreTableModel listen to the maze to find
                 // out how to adjust scores.
                 ScoreTableModel scoreModel = new ScoreTableModel();
                 assert(scoreModel != null);
                 maze.addMazeListener(scoreModel);
                 
-                // Throw up a dialog to get the GUIClient name.
-                String name = JOptionPane.showInputDialog("Enter your name");
-                if((name == null) || (name.length() == 0)) {
-                  Mazewar.quit();
-                }
+                // -----
+                String prompt, name = "";
+                boolean nameExists = false, joinGameSuccess = false;
+                ControlMessage cm;
+                do {
+       
+                	
+                	/* Alert user if username already exists on server */
+                	if (nameExists)
+                		prompt = "Username(" + name + ") already exists.\nSelect new name (Empty string to quit)";
+                	else
+                		prompt = "Enter your name (Empty string to quit)";
+                	
+                	/* Prompt username*/
+                    name = JOptionPane.showInputDialog(prompt);
+            
+                    /* On empty name quit program */
+                    if((name == null) || (name.length() == 0)) {
+                      Mazewar.quit();
+                    }
+                    
+                    commManager.setClientUsername(name);
+                    
+                    /* Setup Message to send */
+                    cm = new ControlMessage();
+                    cm.messageType = ControlMessage.JOIN_GAME_REQUEST;
+                    cm.myInfo = commManager.getMyInfo();
+                    cm.username = name;
+                    
+                    
+                    try {
+                    	/* Send join request and process according to response */
+                        Socket s = new Socket(namingServerHostName, namingServerPortNo);
+        				ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
+                    	ObjectInputStream inStream= new ObjectInputStream(s.getInputStream());
+
+        				outStream.writeObject(cm);
+        				outStream.flush();
+        				
+        				Object o = inStream.readObject();
+        				if (o instanceof ControlMessage) {
+        					cm = (ControlMessage) o;
+        					if (cm.messageType == ControlMessage.JOIN_GAME_REQUEST_FAILURE_MAX_CLIENT_REACHED) {
+        						System.out.println("Game is already full - exiting game");
+        						Mazewar.quit();
+        					}
+        					else if (cm.messageType == ControlMessage.JOIN_GAME_REQUEST_FAILURE_USERNAME_EXISTS) {
+        						nameExists = true;
+        					}
+        					else if (cm.messageType == ControlMessage.JOIN_GAME_REQUEST_SUCCESS) {
+        						joinGameSuccess = true;
+        					}
+        					else {
+        						System.err.println("Error: Unhandled Message Type");
+        						System.exit(1);
+        					}
+        				}
+        				
+        				else {
+        					System.err.println("Error: Message received from naming service is not control message");
+        					System.exit(1);
+        				}
+        				
+        				s.close();
+        				inStream.close();
+        				outStream.close();
+                    }
+                    
+	                catch (Exception e) {
+	                	System.err.println("Exception while contacting naming service");
+	                	System.exit(1);
+	                }
+
+
+                	
+                } while (! joinGameSuccess);
                 
                 // You may want to put your network initialization code somewhere in
                 // here.
@@ -222,6 +307,13 @@ public class Mazewar extends JFrame {
          * @param args Command-line arguments.
          */
         public static void main(String args[]) {
+        	
+        	if (args.length != 2) {
+        		System.err.println("Usage: java Mazewar [NamingServerHostName] [NamingServerPortNumber]");
+        		return;
+        	}
+        	namingServerHostName = args[0];
+        	namingServerPortNo = Integer.parseInt(args[1]);
 
                 /* Create the GUI */
                 new Mazewar();
