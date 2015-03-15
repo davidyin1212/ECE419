@@ -13,8 +13,7 @@ public class ClientCommManager {
 	public ServerSocket connListeningSocket;
 	public ClientConnectionListener connectionListener;
 	private ClientInfo myInfo;
-//	private ObjectInputStream serverInStream;
-//	private ObjectOutputStream serverOutStream;
+
 	private Vector<ClientCommWorker> peers;
 	
 	public ClientCommManager() {
@@ -51,13 +50,12 @@ public class ClientCommManager {
 			// Ignore myself in client list (this client is in the clientList)
 			if (! peer.equals(myInfo)) {
 				try {
-					System.out.println("gg");
 					Socket socket = new Socket(peer.addr, peer.portNo);
-					ClientCommWorker ccm = new ClientCommWorker(socket);
-					System.out.println("gg2");
+					ClientCommWorker ccm = new ClientCommWorker(socket, this);
+					addPeer(ccm);
 					ccm.sendConnInitMsg(getMyInfo(), peer);
 					
-					peers.addElement(ccm);
+					
 					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -72,4 +70,30 @@ public class ClientCommManager {
 		return true;
 	}
 	
+	public synchronized void addPeer(ClientCommWorker peer) {
+		peers.addElement(peer);
+	}
+	
+	public synchronized boolean gameIsReady() {
+		Iterator<ClientCommWorker> it = peers.iterator();
+		ClientCommWorker worker;
+		while (it.hasNext()) {
+			worker = it.next();
+			if (! worker.opponentIsReady) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public synchronized boolean startGameIfReady() {
+		System.out.println(peers.size());
+		if (peers.size() == NamingServer.maxClients - 1) {
+			System.out.println(" OKAY ! STARTING GAME");
+			return true;
+		}
+		System.out.println("Need more clients to start game");
+		return false;
+	}
 }

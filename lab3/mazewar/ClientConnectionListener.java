@@ -18,8 +18,10 @@ public class ClientConnectionListener implements Runnable {
 		try {
 			while (true) {
 				Socket socket = listeningSocket.accept();
-				ClientCommWorker worker = new ClientCommWorker(socket);
+				ClientCommWorker worker = new ClientCommWorker(socket, cm);
+				cm.addPeer(worker);
 				worker.receiveConnInitMsg();
+				
 			}
 			
 		} catch (IOException e) {

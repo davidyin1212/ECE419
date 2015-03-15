@@ -10,18 +10,19 @@ public class ClientCommWorker implements Runnable {
 	ObjectInputStream inputStream;
 	ObjectOutputStream outputStream;
 	String username; /* Target client's username */
+	ClientCommManager commManager;
+
 	
-	public ClientCommWorker(Socket socket) {
+	public ClientCommWorker(Socket socket, ClientCommManager commManager) {
+
 		this.socket = socket;
+		this.commManager = commManager;
 		
 		try {
-			System.out.println("done1");
+
 			this.outputStream = new ObjectOutputStream(this.socket.getOutputStream());
-			System.out.println("done2");
+
 			this.inputStream = new ObjectInputStream(this.socket.getInputStream());
-			
-			
-			System.out.println("done3");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -40,7 +41,8 @@ public class ClientCommWorker implements Runnable {
 			// TODO Auto-generated catch block
 			System.err.println("Error in ClientCommWorker - sendConnInitMsg()");
 		}
-		
+
+		commManager.startGameIfReady();
 		(new Thread(this)).start();
 		
 		
@@ -58,6 +60,7 @@ public class ClientCommWorker implements Runnable {
 				if (cm.messageType == ControlMessage.CONN_INIT_REQUEST) {
 					this.username = cm.username;
 					System.out.println("Connection established with user: "+  this.username);
+					commManager.startGameIfReady();
 					(new Thread(this)).start();
 					
 				}
@@ -76,10 +79,10 @@ public class ClientCommWorker implements Runnable {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		// receive message
+		
 	}
 	
+
 	public void sendMessage() {
 		//send message
 	}
