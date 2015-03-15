@@ -33,6 +33,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.Iterator;
 
 /**
  * The entry point and glue code for the game.  It also contains some helpful
@@ -198,6 +199,9 @@ public class Mazewar extends JFrame {
         					}
         					else if (cm.messageType == ControlMessage.JOIN_GAME_REQUEST_SUCCESS) {
         						joinGameSuccess = true;
+        						
+        						System.out.println("Successfully received Success!");
+        						commManager.initializeConnection(cm.clients);
         					}
         					else {
         						System.err.println("Error: Unhandled Message Type");
@@ -217,6 +221,7 @@ public class Mazewar extends JFrame {
                     
 	                catch (Exception e) {
 	                	System.err.println("Exception while contacting naming service");
+	                	e.printStackTrace();
 	                	System.exit(1);
 	                }
 
@@ -234,12 +239,12 @@ public class Mazewar extends JFrame {
                 
                 // Use braces to force constructors not to be called at the beginning of the
                 // constructor.
-                {
-                        maze.addClient(new RobotClient("Norby"));
-                        maze.addClient(new RobotClient("Robbie"));
-                        maze.addClient(new RobotClient("Clango"));
-                        maze.addClient(new RobotClient("Marvin"));
-                }
+//                {
+//                        maze.addClient(new RobotClient("Norby"));
+//                        maze.addClient(new RobotClient("Robbie"));
+//                        maze.addClient(new RobotClient("Clango"));
+//                        maze.addClient(new RobotClient("Marvin"));
+//                }
 
                 
                 // Create the panel that will display the maze.

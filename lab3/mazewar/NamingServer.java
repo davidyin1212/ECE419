@@ -61,7 +61,6 @@ public class NamingServer {
 				System.err.println("Accepted Client");
 				ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
 				ObjectInputStream inStream= new ObjectInputStream(clientSocket.getInputStream());
-				System.err.println("uhoh");
 				try {
 					ControlMessage msg = (ControlMessage) inStream.readObject();
 					ControlMessage response = testAndAcceptClient(msg);

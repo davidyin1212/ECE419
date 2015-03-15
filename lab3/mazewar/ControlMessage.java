@@ -11,6 +11,10 @@ public class ControlMessage implements Serializable {
 	public static final int JOIN_GAME_REQUEST_FAILURE_USERNAME_EXISTS = 102;
 	public static final int JOIN_GAME_REQUEST_FAILURE_MAX_CLIENT_REACHED = 103;
 	
+	public static final int CONN_INIT_REQUEST = 200;
+	
+	
+	
 	public int messageType; /* Message types defined above */
 	public String username; /* My username */
 	ClientInfo myInfo; /* My Information; inetaddr, port, etc */
