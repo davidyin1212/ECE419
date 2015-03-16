@@ -5,13 +5,28 @@ import java.net.Socket;
 import java.util.PriorityQueue;
 
 
+/**
+ * ClientCommWorker which represents connection to peer
+ * Responsible for 
+ * 		- Setting up connection with peer
+ * 		- Send/receive message to/from peer and delegate to CommManager
+ * @author denny
+ *
+ */
 public class ClientCommWorker implements Runnable {
 
+	/* Socket connection to peer */
 	Socket socket;
 	ObjectInputStream inputStream;
 	ObjectOutputStream outputStream;
-	String username; /* Target client's username */
+	
+	/* Target client's username */
+	String username;
+	
+	/* Holder of this object */
 	ClientCommManager commManager;
+	
+	/* Buffer of received messages from peer */
 	private PriorityQueue<GameMessage> receivedMessageQueue;
 
 	

@@ -14,25 +14,52 @@ import java.util.Vector;
 
 
 
-
+/**
+ * Communication Manager which is responsible for 
+ *  	- setting up connection to each peers
+ * 		- propagating received messages to our game
+ * 		
+ * @author denny
+ *
+ */
 public class ClientCommManager implements Runnable, MazeListener{
+	
+	/* Random Generator */
 	private final static int randomGenSeed = 777;
 	public static Random randomGen = new Random(randomGenSeed);
+	
+	/* Socket and delegate class for listening incoming connection*/
 	public ServerSocket connListeningSocket;
 	public ClientConnectionListener connectionListener;
+	
+	/* My information - username, location, etc*/
 	private ClientInfo myInfo;
 
+	/* Local game message buffer for sent messages */
 	private static PriorityQueue<GameMessage>localMessageQueue = new PriorityQueue<GameMessage>();
 
+	/* Local game message buffer for unsent message (queued for multicast) */
 	public Vector<GameMessage> eventBuffer = new Vector<GameMessage>(); /*Game Message to be multicasted*/
+	
+	/* Communication workers for each peer */
 	public Vector<ClientCommWorker> peers;
+	
+	/* Mazewar game holding this class*/
 	public Mazewar game;
+	
+	/* Clock(seqNo) we expect to process next */
 	private int expectedNextMsgClock = 0 ;
+	
+	/* Clock(seqNo) that we will bind for next multicast */
 	private int nextClock = 0;
+	
+	/* Timestamp of last multicast in miliseconds */
 	long lastMessageSentAt = 0; /* Milliseconds */
 	
+	/* Vector holding game message from each client that will be propagated next to the game*/
 	public Vector<GameMessage> toBeDispatched = new Vector<GameMessage>();
 	
+	/* Comparator: sort based on sender's name */
 	Comparator<GameMessage> msgComparator = new Comparator<GameMessage>() {
 		@Override
 		public int compare(GameMessage m1, GameMessage m2) {
@@ -40,6 +67,7 @@ public class ClientCommManager implements Runnable, MazeListener{
 			return m1.senderName.compareTo(m2.senderName);
 		}
 	};
+	
 	
 	public ClientCommManager(Mazewar game) {
 		try {
@@ -109,7 +137,7 @@ public class ClientCommManager implements Runnable, MazeListener{
 	public synchronized boolean startGameIfReady() {
 
 		if (peers.size() == NamingServer.maxClients - 1) {
-			System.out.println(" OKAY ! STARTING GAME");
+			System.out.println(" Connection setup with peers done - starting game!");
 			game.startGame();
 			
 			for (ClientCommWorker worker : peers) {
@@ -118,7 +146,7 @@ public class ClientCommManager implements Runnable, MazeListener{
 			(new Thread(this)).start();
 			return true;
 		}
-		System.out.println("Need more clients to start game");
+
 		return false;
 	}
 	
@@ -176,15 +204,15 @@ public class ClientCommManager implements Runnable, MazeListener{
 				lastMessageSentAt = curTime;
 			}
 			
+			// Propagate buffered message if received from each peers 
 			if (hasNextLocalMessage(expectedNextMsgClock)) {
-
 				
 				for (ClientCommWorker cm : peers) {
 					if (! cm.hasNextMessage(expectedNextMsgClock)) {
 						msgRdy = false;
 					}
 				}
-
+				// Yes we received message from each peer
 				if (msgRdy) {
 			
 					toBeDispatched.add(getNextLocalMessage());
@@ -196,8 +224,10 @@ public class ClientCommManager implements Runnable, MazeListener{
 					}
 
 					toBeDispatched.sort(msgComparator); // Sort based on username
+					
+					// Propagate game message
 					for (GameMessage msg : toBeDispatched) {
-						// process message here
+
 						Client client = game.getClient(msg.senderName);
 						switch (msg.messageType) {
 							case (GameMessage.GAME_MESSAGE_TYPE_FIRE):
@@ -229,10 +259,13 @@ public class ClientCommManager implements Runnable, MazeListener{
 	
 					}
 					
+					/*
+					 * Missile tick every 200ms
+					 * Since we send/receive message every 100ms, we have to tick
+					 * missile on every second message 
+					 */
 					if ((expectedNextMsgClock + 1) % 2 == 0) {
-						// It's 200ms where we should tick missile
 						game.maze.tickMissile();
-						
 					}
 					expectedNextMsgClock++;
 				}

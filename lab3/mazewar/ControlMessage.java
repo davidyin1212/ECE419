@@ -2,6 +2,14 @@ import java.io.Serializable;
 import java.util.Vector;
 
 
+/**
+ * Control Message used for administrative purpose such as 
+ * 		- Contacting naming server
+ * 		- setting up connection with peer
+ * 
+ * @author denny
+ *
+ */
 public class ControlMessage implements Serializable {
 
 
@@ -19,7 +27,6 @@ public class ControlMessage implements Serializable {
 	public int messageType; /* Message types defined above */
 	public String username; /* My username */
 	ClientInfo myInfo; /* My Information; inetaddr, port, etc */
-	Point spawnLoc;
 	
 	Vector<ClientInfo> clients; /* Other clients' info - filled in by server */
 	

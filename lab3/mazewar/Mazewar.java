@@ -320,7 +320,6 @@ public class Mazewar extends JFrame {
             }
             
             Collections.sort(clientNames);
-            System.out.println(clientNames.toString());
             for (String name : clientNames) {
             	Point p = MazeImpl.getRandomPoint(ClientCommManager.randomGen);
             	if (name == guiClient.getName()) {

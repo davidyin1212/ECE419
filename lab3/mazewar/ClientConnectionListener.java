@@ -2,10 +2,18 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-
+/**
+ * 
+ * ConnectionListener which is responsible for new incoming connection from peer
+ * @author denny
+ *
+ */
 public class ClientConnectionListener implements Runnable {
 
+	/* Reference to communication manager */
 	ClientCommManager cm;
+	
+	/* Socket for listening incoming connection request */
 	private ServerSocket listeningSocket;
 	
 	public ClientConnectionListener(ClientCommManager cm) {
