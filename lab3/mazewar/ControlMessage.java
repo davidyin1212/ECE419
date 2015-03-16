@@ -12,12 +12,14 @@ public class ControlMessage implements Serializable {
 	public static final int JOIN_GAME_REQUEST_FAILURE_MAX_CLIENT_REACHED = 103;
 	
 	public static final int CONN_INIT_REQUEST = 200;
+	public static final int CONN_INIT_SUCCESS = 201;
 	
 	
 	
 	public int messageType; /* Message types defined above */
 	public String username; /* My username */
 	ClientInfo myInfo; /* My Information; inetaddr, port, etc */
+	Point spawnLoc;
 	
 	Vector<ClientInfo> clients; /* Other clients' info - filled in by server */
 	

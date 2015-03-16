@@ -3,6 +3,8 @@ import java.io.Serializable;
 
 public class GameMessage implements Serializable, Comparable<GameMessage>{
 
+
+
 	/*
 	 * Spawn playerName on point
 	 * Using following optional fields:

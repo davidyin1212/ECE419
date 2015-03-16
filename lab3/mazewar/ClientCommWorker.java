@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.PriorityQueue;
 
 
 public class ClientCommWorker implements Runnable {
@@ -11,12 +12,14 @@ public class ClientCommWorker implements Runnable {
 	ObjectOutputStream outputStream;
 	String username; /* Target client's username */
 	ClientCommManager commManager;
+	private PriorityQueue<GameMessage> receivedMessageQueue;
 
 	
 	public ClientCommWorker(Socket socket, ClientCommManager commManager) {
 
 		this.socket = socket;
 		this.commManager = commManager;
+		this.receivedMessageQueue = new PriorityQueue<GameMessage>();
 		
 		try {
 
@@ -30,20 +33,25 @@ public class ClientCommWorker implements Runnable {
 	}
 	
 	public void sendConnInitMsg(ClientInfo myInfo, ClientInfo target) {
+		
+		this.username = target.username;
+		
 		ControlMessage cm = new ControlMessage();
 		cm.messageType = ControlMessage.CONN_INIT_REQUEST;
 		cm.username = myInfo.username;
 		
+		
+		
 		try {
-			outputStream.writeObject(cm);
+			outputStream.writeObject(cm);		
 			System.out.println("Connection established with user: " + target.username);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.err.println("Error in ClientCommWorker - sendConnInitMsg()");
 		}
 
 		commManager.startGameIfReady();
-		(new Thread(this)).start();
+
 		
 		
 	}
@@ -60,8 +68,9 @@ public class ClientCommWorker implements Runnable {
 				if (cm.messageType == ControlMessage.CONN_INIT_REQUEST) {
 					this.username = cm.username;
 					System.out.println("Connection established with user: "+  this.username);
+					
 					commManager.startGameIfReady();
-					(new Thread(this)).start();
+					
 					
 				}
 			}
@@ -80,11 +89,47 @@ public class ClientCommWorker implements Runnable {
 	@Override
 	public void run() {
 		
+		while (! Thread.currentThread().isInterrupted()) {
+
+			try {
+				GameMessage m = (GameMessage) inputStream.readObject();
+		
+				addReceivedMessage(m);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
+	public synchronized void addReceivedMessage(GameMessage msg) {
+
+		receivedMessageQueue.add(msg);
+	}
+	
+	public synchronized boolean hasNextMessage(int clock) {
+		if (receivedMessageQueue.peek() == null) return false;
+
+		return receivedMessageQueue.peek().clock == clock;
+	}
+	
+	public synchronized GameMessage getNextMessage() {
+		if (receivedMessageQueue.peek() == null) {
+			System.out.println("you should never fucking call this idiot");
+		}
+		return receivedMessageQueue.poll();
 	}
 	
 
-	public void sendMessage() {
-		//send message
+
+	public void sendMessage(GameMessage message) {
+		try {
+			outputStream.writeObject(message);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

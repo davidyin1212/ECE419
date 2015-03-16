@@ -114,9 +114,15 @@ public abstract class Client {
          */
         private String name = null;
        
+        /**
+         * initially clients are dead until receive/post SPAWN message 
+         */
+        public boolean isDead = true;
+        
         /** 
          * Create a new client with the specified name.
          */
+        
         protected Client(String name) {
                 assert(name != null);
                 this.name = name;

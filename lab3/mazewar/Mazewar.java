@@ -33,7 +33,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * The entry point and glue code for the game.  It also contains some helpful
@@ -52,12 +54,12 @@ public class Mazewar extends JFrame {
         /**
          * The default width of the {@link Maze}.
          */
-        private final int mazeWidth = 20;
+        public static final int mazeWidth = 20;
 
         /**
          * The default height of the {@link Maze}.
          */
-        private final int mazeHeight = 10;
+        public static final int mazeHeight = 10;
 
         /**
          * The default random seed for the {@link Maze}.
@@ -74,13 +76,18 @@ public class Mazewar extends JFrame {
         /**
          * The {@link GUIClient} for the game.
          */
-        private GUIClient guiClient = null;
+        public GUIClient guiClient = null;
 
         /**
          * The panel that displays the {@link Maze}.
          */
         private OverheadMazePanel overheadPanel = null;
+        
+        private JScrollPane consoleScrollPane = null; 
 
+        private JScrollPane scoreScrollPane = null;
+        
+        private ScoreTableModel scoreModel = null;
         /**
          * The table the displays the scores.
          */
@@ -140,11 +147,11 @@ public class Mazewar extends JFrame {
                 assert(maze != null);
                 
                 // Create communication Manager
-                commManager = new ClientCommManager();
+                commManager = new ClientCommManager(this);
                 
                 // Have the ScoreTableModel listen to the maze to find
                 // out how to adjust scores.
-                ScoreTableModel scoreModel = new ScoreTableModel();
+                scoreModel = new ScoreTableModel();
                 assert(scoreModel != null);
                 maze.addMazeListener(scoreModel);
                 
@@ -201,6 +208,7 @@ public class Mazewar extends JFrame {
         						joinGameSuccess = true;
         						
         						System.out.println("Successfully received Success!");
+        						guiClient = new GUIClient(name);
         						commManager.initializeConnection(cm.clients);
         					}
         					else {
@@ -222,7 +230,7 @@ public class Mazewar extends JFrame {
 	                catch (Exception e) {
 	                	System.err.println("Exception while contacting naming service");
 	                	e.printStackTrace();
-	                	System.exit(1);
+	                	//System.exit(1);
 	                }
 
 
@@ -233,9 +241,9 @@ public class Mazewar extends JFrame {
                 // here.
                 
                 // Create the GUIClient and connect it to the KeyListener queue
-                guiClient = new GUIClient(name);
-                maze.addClient(guiClient);
-                this.addKeyListener(guiClient);
+                
+//                maze.addClient(guiClient);
+//                this.addKeyListener(guiClient);
                 
                 // Use braces to force constructors not to be called at the beginning of the
                 // constructor.
@@ -247,66 +255,92 @@ public class Mazewar extends JFrame {
 //                }
 
                 
-                // Create the panel that will display the maze.
-                overheadPanel = new OverheadMazePanel(maze, guiClient);
-                assert(overheadPanel != null);
-                maze.addMazeListener(overheadPanel);
-                
-                // Don't allow editing the console from the GUI
-                console.setEditable(false);
-                console.setFocusable(false);
-                console.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder()));
                
-                // Allow the console to scroll by putting it in a scrollpane
-                JScrollPane consoleScrollPane = new JScrollPane(console);
-                assert(consoleScrollPane != null);
-                consoleScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Console"));
-                
-                // Create the score table
-                scoreTable = new JTable(scoreModel);
-                assert(scoreTable != null);
-                scoreTable.setFocusable(false);
-                scoreTable.setRowSelectionAllowed(false);
-
-                // Allow the score table to scroll too.
-                JScrollPane scoreScrollPane = new JScrollPane(scoreTable);
-                assert(scoreScrollPane != null);
-                scoreScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Scores"));
-                
-                // Create the layout manager
-                GridBagLayout layout = new GridBagLayout();
-                GridBagConstraints c = new GridBagConstraints();
-                getContentPane().setLayout(layout);
-                
-                // Define the constraints on the components.
-                c.fill = GridBagConstraints.BOTH;
-                c.weightx = 1.0;
-                c.weighty = 3.0;
-                c.gridwidth = GridBagConstraints.REMAINDER;
-                layout.setConstraints(overheadPanel, c);
-                c.gridwidth = GridBagConstraints.RELATIVE;
-                c.weightx = 2.0;
-                c.weighty = 1.0;
-                layout.setConstraints(consoleScrollPane, c);
-                c.gridwidth = GridBagConstraints.REMAINDER;
-                c.weightx = 1.0;
-                layout.setConstraints(scoreScrollPane, c);
-                                
-                // Add the components
-                getContentPane().add(overheadPanel);
-                getContentPane().add(consoleScrollPane);
-                getContentPane().add(scoreScrollPane);
-                
-                // Pack everything neatly.
-                pack();
-
-                // Let the magic begin.
-                setVisible(true);
-                overheadPanel.repaint();
-                this.requestFocusInWindow();
+                  
+               
         }
 
         
+        public void startGame() {
+        	 // Create the panel that will display the maze.
+            overheadPanel = new OverheadMazePanel(maze, guiClient);
+            assert(overheadPanel != null);
+            maze.addMazeListener(overheadPanel);
+            
+            // Don't allow editing the console from the GUI
+            console.setEditable(false);
+            console.setFocusable(false);
+            console.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder()));
+           
+            // Allow the console to scroll by putting it in a scrollpane
+            consoleScrollPane = new JScrollPane(console);
+            assert(consoleScrollPane != null);
+            consoleScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Console"));
+            
+            // Create the score table
+            scoreTable = new JTable(scoreModel);
+            assert(scoreTable != null);
+            scoreTable.setFocusable(false);
+            scoreTable.setRowSelectionAllowed(false);
+
+            // Allow the score table to scroll too.
+            scoreScrollPane = new JScrollPane(scoreTable);
+            assert(scoreScrollPane != null);
+            scoreScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Scores"));
+            
+            // Create the layout manager
+            GridBagLayout layout = new GridBagLayout();
+            GridBagConstraints c = new GridBagConstraints();
+            getContentPane().setLayout(layout);
+            
+            // Define the constraints on the components.
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1.0;
+            c.weighty = 3.0;
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            layout.setConstraints(overheadPanel, c);
+            c.gridwidth = GridBagConstraints.RELATIVE;
+            c.weightx = 2.0;
+            c.weighty = 1.0;
+            layout.setConstraints(consoleScrollPane, c);
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            c.weightx = 1.0;
+            layout.setConstraints(scoreScrollPane, c);
+        	
+        	
+        	// ------
+            Vector<String> clientNames = new Vector<String>();
+            clientNames.add(commManager.getMyname());
+            for(ClientCommWorker peer : commManager.peers) {
+            	clientNames.add(peer.username);
+            }
+            
+            Collections.sort(clientNames);
+            System.out.println(clientNames.toString());
+            for (String name : clientNames) {
+            	Point p = MazeImpl.getRandomPoint(ClientCommManager.randomGen);
+            	if (name == guiClient.getName()) {
+            		maze.addClient(guiClient, p);
+            		
+            	}
+            	else {
+            		maze.addClient(new RemoteClient(name), p);
+            	}
+            }
+        	
+        	 // Add the components
+            getContentPane().add(overheadPanel);
+            getContentPane().add(consoleScrollPane);
+            getContentPane().add(scoreScrollPane);
+            
+            // Pack everything neatly.
+            pack();
+            this.addKeyListener(guiClient);
+            // Let the magic begin.
+            setVisible(true);
+            overheadPanel.repaint();
+            this.requestFocusInWindow();
+        }
         /**
          * Entry point for the game.  
          * @param args Command-line arguments.

@@ -433,7 +433,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
          * @param client The {@link Client} to be added.
          * @param point The location the {@link Client} should be added.
          */
-        private synchronized void addClient(Client client, Point point) {
+        public synchronized void addClient(Client client, Point point) {
                 assert(client != null);
                 assert(checkBounds(point));
                 CellImpl cell = getCellImpl(point);
@@ -447,6 +447,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 client.addClientListener(this);
                 update();
                 notifyClientAdd(client);
+
         }
         
         /**
@@ -874,5 +875,9 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 Object o2 = v1.get(point.getY());
                 assert(o2 instanceof CellImpl);
                 return (CellImpl)o2;
+        }
+        
+        public static Point getRandomPoint(Random randomGen) {
+        	return new Point(randomGen.nextInt(Mazewar.mazeWidth),randomGen.nextInt(Mazewar.mazeHeight));
         }
 }

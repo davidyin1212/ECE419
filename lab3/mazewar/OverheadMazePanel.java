@@ -153,6 +153,7 @@ public class OverheadMazePanel extends JPanel implements MazeListener {
                 
                 // Obtain the location of the distinguished client
                 Point cp = maze.getClientPoint(client);
+                // HERE IF CLIENT IS DEAD JUST RETURN!
                 
                 for(int i = 0; i < p.getY(); i++) {
                         for(int j = 0; j < p.getX(); j++) {
