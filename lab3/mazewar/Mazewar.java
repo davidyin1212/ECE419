@@ -71,12 +71,14 @@ public class Mazewar extends JFrame {
         /**
          * The {@link Maze} that the game uses.
          */
-        private Maze maze = null;
+        public Maze maze = null;
 
         /**
          * The {@link GUIClient} for the game.
          */
         public GUIClient guiClient = null;
+        
+        public Vector<RemoteClient> remoteClients;
 
         /**
          * The panel that displays the {@link Maze}.
@@ -141,7 +143,7 @@ public class Mazewar extends JFrame {
         public Mazewar() {
                 super("ECE419 Mazewar");
                 consolePrintLn("ECE419 Mazewar started!");
-                
+                remoteClients = new Vector<RemoteClient>();
                 // Create the maze
                 maze = new MazeImpl(new Point(mazeWidth, mazeHeight), mazeSeed);
                 assert(maze != null);
@@ -149,11 +151,13 @@ public class Mazewar extends JFrame {
                 // Create communication Manager
                 commManager = new ClientCommManager(this);
                 
+                maze.addMazeListener(commManager);
                 // Have the ScoreTableModel listen to the maze to find
                 // out how to adjust scores.
                 scoreModel = new ScoreTableModel();
                 assert(scoreModel != null);
                 maze.addMazeListener(scoreModel);
+                
                 
                 // -----
                 String prompt, name = "";
@@ -208,7 +212,7 @@ public class Mazewar extends JFrame {
         						joinGameSuccess = true;
         						
         						System.out.println("Successfully received Success!");
-        						guiClient = new GUIClient(name);
+        						guiClient = new GUIClient(name, commManager);
         						commManager.initializeConnection(cm.clients);
         					}
         					else {
@@ -324,7 +328,9 @@ public class Mazewar extends JFrame {
             		
             	}
             	else {
-            		maze.addClient(new RemoteClient(name), p);
+            		RemoteClient remoteClient = new RemoteClient(name);
+            		remoteClients.addElement(remoteClient);
+            		maze.addClient(remoteClient, p);
             	}
             }
         	
@@ -340,6 +346,20 @@ public class Mazewar extends JFrame {
             setVisible(true);
             overheadPanel.repaint();
             this.requestFocusInWindow();
+        }
+        
+        public Client getClient(String username) {
+        	if (guiClient.getName().equals(username)) {
+        		return guiClient;
+        	}
+        	else {
+        		for (RemoteClient rc : remoteClients) {
+        			if (rc.getName().equals(username)) {
+        				return rc;
+        			}
+        		}
+        	}
+        	return null;
         }
         /**
          * Entry point for the game.  

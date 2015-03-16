@@ -437,9 +437,9 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 assert(client != null);
                 assert(checkBounds(point));
                 CellImpl cell = getCellImpl(point);
-                Direction d = Direction.random();
+                Direction d = Direction.North;
                 while(cell.isWall(d)) {
-                  d = Direction.random();
+                  d = Direction.nextDirection(d);
                 }
                 cell.setContents(client);
                 clientMap.put(client, new DirectedPoint(point, d));
@@ -458,6 +458,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
         private synchronized void killClient(Client source, Client target) {
                 assert(source != null);
                 assert(target != null);
+                target.isDead = true;
                 Mazewar.consolePrintLn(source.getName() + " just vaporized " + 
                                 target.getName());
                 Object o = clientMap.remove(target);
@@ -465,24 +466,42 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 Point point = (Point)o;
                 CellImpl cell = getCellImpl(point);
                 cell.setContents(null);
-                // Pick a random starting point, and check to see if it is already occupied
-                point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
-                cell = getCellImpl(point);
-                // Repeat until we find an empty cell
-                while(cell.getContents() != null) {
-                        point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
-                        cell = getCellImpl(point);
-                }
-                Direction d = Direction.random();
-                while(cell.isWall(d)) {
-                        d = Direction.random();
-                }
-                cell.setContents(target);
-                clientMap.put(target, new DirectedPoint(point, d));
+//                // Pick a random starting point, and check to see if it is already occupied
+//                point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
+//                cell = getCellImpl(point);
+//                // Repeat until we find an empty cell
+//                while(cell.getContents() != null) {
+//                        point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
+//                        cell = getCellImpl(point);
+//                }
+//                Direction d = Direction.random();
+//                while(cell.isWall(d)) {
+//                        d = Direction.random();
+//                }
+//                cell.setContents(target);
+//                clientMap.put(target, new DirectedPoint(point, d));
                 update();
                 notifyClientKilled(source, target);
         }
         
+        public synchronized void respawnClient(Client client, Random rand) {
+          // Pick a random starting point, and check to see if it is already occupied
+          Point point = new Point(rand.nextInt(maxX),rand.nextInt(maxY));
+          CellImpl cell = getCellImpl(point);
+          // Repeat until we find an empty cell
+          while(cell.getContents() != null) {
+                  point = new Point(rand.nextInt(maxX), rand.nextInt(maxY));
+                  cell = getCellImpl(point);
+          }
+          Direction d = Direction.North;
+          while(cell.isWall(d)) {
+                  d = Direction.nextDirection(d);
+          }
+          cell.setContents(client);
+          clientMap.put(client, new DirectedPoint(point, d));
+          client.isDead = false;
+          update();
+        }
         /**
          * Internal helper called when a {@link Client} emits a turnLeft action.
          * @param client The {@link Client} to rotate.

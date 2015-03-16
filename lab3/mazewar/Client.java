@@ -117,7 +117,7 @@ public abstract class Client {
         /**
          * initially clients are dead until receive/post SPAWN message 
          */
-        public boolean isDead = true;
+        public boolean isDead = false;
         
         /** 
          * Create a new client with the specified name.

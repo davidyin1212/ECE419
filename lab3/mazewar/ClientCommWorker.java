@@ -93,7 +93,6 @@ public class ClientCommWorker implements Runnable {
 
 			try {
 				GameMessage m = (GameMessage) inputStream.readObject();
-		
 				addReceivedMessage(m);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

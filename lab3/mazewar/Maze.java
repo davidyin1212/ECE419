@@ -18,6 +18,7 @@ USA.
 */
   
 import java.util.Iterator;
+import java.util.Random;
 
 /**
  * An abstract class for representing mazes, and the operations a {@link Client}
@@ -116,5 +117,7 @@ public abstract class Maze {
      * @param ml An object implementing the {@link MazeListener} interface.
      */
     public abstract void removeMazeListener(MazeListener ml);
+    
+    public abstract void respawnClient(Client client, Random rand);
     
 }

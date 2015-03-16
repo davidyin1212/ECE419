@@ -15,7 +15,7 @@ import java.util.Vector;
 
 
 
-public class ClientCommManager implements Runnable {
+public class ClientCommManager implements Runnable, MazeListener{
 	private final static int randomGenSeed = 777;
 	public static Random randomGen = new Random(randomGenSeed);
 	public ServerSocket connListeningSocket;
@@ -125,12 +125,10 @@ public class ClientCommManager implements Runnable {
 	public synchronized void multicast(GameMessage message) {
 		message.clock = nextClock;
 		nextClock++;
-		System.out.println("multicasting!");
 		message.senderName = myInfo.username;
 		
 		// Buffer my own message
 		localMessageQueue.add(message);
-
 		Iterator<ClientCommWorker> workers = peers.iterator();
 		while (workers.hasNext()) {
 			ClientCommWorker peer = workers.next();
@@ -146,6 +144,11 @@ public class ClientCommManager implements Runnable {
 	
 	public synchronized GameMessage getNextLocalMessage() {
 		return localMessageQueue.poll();
+	}
+	
+	public synchronized void registerLocalEvent(GameMessage message) {
+		message.senderName = myInfo.username;
+		eventBuffer.addElement(message);
 	}
 	
 	
@@ -192,10 +195,38 @@ public class ClientCommManager implements Runnable {
 						toBeDispatched.add(msg);
 					}
 
-					toBeDispatched.sort(msgComparator);
+					toBeDispatched.sort(msgComparator); // Sort based on username
 					for (GameMessage msg : toBeDispatched) {
 						// process message here
-						System.out.println(msg.clock);
+						Client client = game.getClient(msg.senderName);
+						switch (msg.messageType) {
+							case (GameMessage.GAME_MESSAGE_TYPE_FIRE):
+								client.fire();
+								break;
+							case (GameMessage.GAME_MESSAGE_TYPE_MOVE_PLAYER_BACKWARD):
+								client.backup();
+								break;
+							
+							case (GameMessage.GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD):
+								client.forward();
+								break;
+							
+							case (GameMessage.GAME_MESSAGE_TYPE_SPAWN_PLAYER):
+								game.maze.respawnClient(client, randomGen);
+								break;
+							
+							case (GameMessage.GAME_MESSAGE_TYPE_TURN_LEFT):
+								client.turnLeft();
+								break;
+							
+							case (GameMessage.GAME_MESSAGE_TYPE_TURN_RIGHT):
+								client.turnRight();
+								break;
+							default:
+								
+								break;
+						}
+	
 					}
 					
 					expectedNextMsgClock++;
@@ -204,6 +235,42 @@ public class ClientCommManager implements Runnable {
 			}
 			
 		}
+	}
+
+	@Override
+	public void mazeUpdate() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientKilled(Client source, Client target) {
+		if (target instanceof GUIClient) {
+			GameMessage msg = new GameMessage();
+			msg.senderName = myInfo.username;
+			msg.messageType = GameMessage.GAME_MESSAGE_TYPE_SPAWN_PLAYER;
+			
+			registerLocalEvent(msg);
+		}
+		
+	}
+
+	@Override
+	public void clientAdded(Client client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientFired(Client client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientRemoved(Client client) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

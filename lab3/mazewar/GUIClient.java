@@ -29,11 +29,13 @@ import java.awt.event.KeyEvent;
 
 public class GUIClient extends LocalClient implements KeyListener {
 
+		private ClientCommManager communicationManager;
         /**
          * Create a GUI controlled {@link LocalClient}.  
          */
-        public GUIClient(String name) {
+        public GUIClient(String name, ClientCommManager ccm) {
                 super(name);
+                communicationManager = ccm;
         }
         
         /**
@@ -41,25 +43,34 @@ public class GUIClient extends LocalClient implements KeyListener {
          * @param e The {@link KeyEvent} that occurred.
          */
         public void keyPressed(KeyEvent e) {
+        	
+        	GameMessage msg = new GameMessage();
                 // If the user pressed Q, invoke the cleanup code and quit. 
                 if((e.getKeyChar() == 'q') || (e.getKeyChar() == 'Q')) {
                         Mazewar.quit();
+                        return;
                 // Up-arrow moves forward.
                 } else if(e.getKeyCode() == KeyEvent.VK_UP) {
-                        forward();
+                        //forward();
+                		msg.messageType = GameMessage.GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD;
                 // Down-arrow moves backward.
                 } else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
-                        backup();
+                        //backup();
+                	msg.messageType = GameMessage.GAME_MESSAGE_TYPE_MOVE_PLAYER_BACKWARD;
                 // Left-arrow turns left.
                 } else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-                        turnLeft();
+//                        turnLeft();
+                	msg.messageType = GameMessage.GAME_MESSAGE_TYPE_TURN_LEFT;
                 // Right-arrow turns right.
                 } else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                        turnRight();
+                        //turnRight();
+                	msg.messageType = GameMessage.GAME_MESSAGE_TYPE_TURN_RIGHT;
                 // Spacebar fires.
                 } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-                        fire();
+                        //fire();
+                	msg.messageType = GameMessage.GAME_MESSAGE_TYPE_FIRE;
                 }
+                communicationManager.registerLocalEvent(msg);
         }
         
         /**

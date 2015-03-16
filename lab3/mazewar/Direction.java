@@ -183,4 +183,19 @@ public class Direction {
                 /* Impossible */
                 return null;
         }
+        
+        public static Direction nextDirection(Direction d) {
+        	switch(d.direction) {
+        		case NORTH:
+        			return East;
+        		case EAST:
+        			return South;
+        		case SOUTH:
+        			return West;
+        		case WEST:
+        			return North;
+        	}
+        	/* Impossible */
+        	return null;
+        }
 }
