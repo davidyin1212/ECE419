@@ -120,4 +120,6 @@ public abstract class Maze {
     
     public abstract void respawnClient(Client client, Random rand);
     
+    public abstract void tickMissile();
+    
 }

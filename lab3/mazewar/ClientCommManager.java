@@ -229,6 +229,11 @@ public class ClientCommManager implements Runnable, MazeListener{
 	
 					}
 					
+					if ((expectedNextMsgClock + 1) % 2 == 0) {
+						// It's 200ms where we should tick missile
+						game.maze.tickMissile();
+						
+					}
 					expectedNextMsgClock++;
 				}
 				

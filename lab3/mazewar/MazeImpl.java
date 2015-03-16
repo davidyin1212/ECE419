@@ -43,8 +43,10 @@ import java.util.HashMap;
  * @version $Id: MazeImpl.java 371 2004-02-10 21:55:32Z geoffw $
  */
 
-public class MazeImpl extends Maze implements Serializable, ClientListener, Runnable {
+public class MazeImpl extends Maze implements Serializable, ClientListener {
 
+		Collection deadPrj = new HashSet();
+		
         /**
          * Create a {@link Maze}.
          * @param point Treat the {@link Point} as a magintude specifying the
@@ -69,7 +71,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                         mazeVector.insertElementAt(colVector, i);
                 }
 
-                thread = new Thread(this);
+  
 
                 // Initialized the random number generator
                 randomGen = new Random(seed);
@@ -77,7 +79,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 // Build the maze starting at the corner
                 buildMaze(new Point(0,0));
 
-                thread.start();
+                //thread.start();
         }
        
         /** 
@@ -328,47 +330,53 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 }
         }
 
-        /**
-         * Control loop for {@link Projectile}s.
-         */
-        public void run() {
-                Collection deadPrj = new HashSet();
-                while(true) {
-                        if(!projectileMap.isEmpty()) {
-                        	try {
-                                Iterator it = projectileMap.keySet().iterator();
-                                synchronized(projectileMap) {
-                                        while(it.hasNext()) {   
-                                                Object o = it.next();
-                                                assert(o instanceof Projectile);
-                                                // if this projectile hasn't already  been destroyed by another
-                                                if (((Projectile)o).remove_flag == false)
-                                                    deadPrj.addAll(moveProjectile((Projectile)o));
-                                                
-                                        }               
-                                        it = deadPrj.iterator();
-                                        while(it.hasNext()) {
-                                                Object o = it.next();
-                                                assert(o instanceof Projectile);
-                                                Projectile prj = (Projectile)o;
-                                                projectileMap.remove(prj);
-                                                clientFired.remove(prj.getOwner());
-                                        }
-                                        deadPrj.clear();
-                                }
-                        	}
-                        	catch (ConcurrentModificationException cme) {
-                        		// Will not handle this 
-                        	}
-
-                        }
-                        try {
-                                thread.sleep(200);
-                        } catch(Exception e) {
-                                // shouldn't happen
-                        }
-                }
+        public synchronized void tickMissile() {
+        	
+        	
+        	 if(!projectileMap.isEmpty()) {
+             	try {
+                     Iterator it = projectileMap.keySet().iterator();
+                     synchronized(projectileMap) {
+                             while(it.hasNext()) {   
+                                     Object o = it.next();
+                                     assert(o instanceof Projectile);
+                                     // if this projectile hasn't already  been destroyed by another
+                                     if (((Projectile)o).remove_flag == false)
+                                         deadPrj.addAll(moveProjectile((Projectile)o));
+                                     
+                             }               
+                             it = deadPrj.iterator();
+                             while(it.hasNext()) {
+                                     Object o = it.next();
+                                     assert(o instanceof Projectile);
+                                     Projectile prj = (Projectile)o;
+                                     projectileMap.remove(prj);
+                                     clientFired.remove(prj.getOwner());
+                             }
+                             deadPrj.clear();
+                     }
+             	}
+             	catch (ConcurrentModificationException cme) {
+             		// Will not handle this 
+             	}
+        	 }
         }
+//        /**
+//         * Control loop for {@link Projectile}s.
+//         */
+//        public void run() {
+//                
+//                while(true) {
+//                       
+//
+//                        }
+//                        try {
+//                                thread.sleep(200);
+//                        } catch(Exception e) {
+//                                // shouldn't happen
+//                        }
+//                }
+//        }
         
         /* Internals */
         
@@ -615,11 +623,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
          */
         private final Set clientFired = new HashSet();
        
-        /**
-         * The thread used to manage {@link Projectile}s.
-         */
-        private final Thread thread;
-        
+
         /**
          * Generate a notification to listeners that a
          * {@link Client} has been added.
