@@ -3,6 +3,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
@@ -223,8 +224,8 @@ public class ClientCommManager implements Runnable, MazeListener{
 						toBeDispatched.add(msg);
 					}
 
-					toBeDispatched.sort(msgComparator); // Sort based on username
-					
+					//toBeDispatched.sort(msgComparator); // Sort based on username
+					Collections.sort(toBeDispatched, msgComparator);
 					// Propagate game message
 					for (GameMessage msg : toBeDispatched) {
 
