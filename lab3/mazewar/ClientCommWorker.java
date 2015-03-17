@@ -130,7 +130,7 @@ public class ClientCommWorker implements Runnable {
 	
 	public synchronized GameMessage getNextMessage() {
 		if (receivedMessageQueue.peek() == null) {
-			System.out.println("you should never fucking call this idiot");
+
 		}
 		return receivedMessageQueue.poll();
 	}

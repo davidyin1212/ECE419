@@ -80,7 +80,6 @@ public class ClientCommManager implements Runnable {
 			//myInfo.addr = connListeningSocket.getInetAddress();
 			myInfo.addr = InetAddress.getByName( InetAddress.getLocalHost().getHostAddress());
 			//myInfo.addr = InetAddress.getLocalHost().getHostAddress();
-			System.out.println("fucking shit" +  InetAddress.getLocalHost().getHostAddress());
 			
 			myInfo.portNo = connListeningSocket.getLocalPort();
 			connectionListener = new ClientConnectionListener(this);
