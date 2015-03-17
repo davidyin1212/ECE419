@@ -153,8 +153,7 @@ public class OverheadMazePanel extends JPanel implements MazeListener {
                 
                 // Obtain the location of the distinguished client
                 Point cp = maze.getClientPoint(client);
-                // HERE IF CLIENT IS DEAD JUST RETURN!
-                if (client.isDead) return;
+
                 
                 for(int i = 0; i < p.getY(); i++) {
                         for(int j = 0; j < p.getX(); j++) {
@@ -195,7 +194,7 @@ public class OverheadMazePanel extends JPanel implements MazeListener {
                                                                 
                                                         double xoffset = llx + j*cellwidth + (cellwidth/2.0);
                                                         double yoffset = lly + i*cellheight + (cellheight/2.0);
-                                                        if (c.isDead) return;
+       
                                                         Direction orient = c.getOrientation();
                                                         g2.translate(xoffset, yoffset);
                                                         double rotation = 0.0; 

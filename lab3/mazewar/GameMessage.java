@@ -8,7 +8,7 @@ import java.io.Serializable;
  */
 public class GameMessage implements Serializable, Comparable<GameMessage>{
 
-	public static final int GAME_MESSAGE_TYPE_SPAWN_PLAYER = 300;
+
 	
 	public static final int GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD = 301;
 	

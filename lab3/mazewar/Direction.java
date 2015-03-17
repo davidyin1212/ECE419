@@ -32,7 +32,7 @@ public class Direction {
         /**
          * Create a random number generator to produce random directions.
          */
-        private static Random randomGen = new Random();
+        private static Random randomGen = new Random(777);
         
         /** 
          * Internal representation of directions
@@ -184,18 +184,5 @@ public class Direction {
                 return null;
         }
         
-        public static Direction nextDirection(Direction d) {
-        	switch(d.direction) {
-        		case NORTH:
-        			return East;
-        		case EAST:
-        			return South;
-        		case SOUTH:
-        			return West;
-        		case WEST:
-        			return North;
-        	}
-        	/* Impossible */
-        	return null;
-        }
+
 }

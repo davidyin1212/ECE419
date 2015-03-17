@@ -24,7 +24,7 @@ import java.util.Vector;
  * @author denny
  *
  */
-public class ClientCommManager implements Runnable, MazeListener{
+public class ClientCommManager implements Runnable {
 	
 	/* Random Generator */
 	private final static int randomGenSeed = 777;
@@ -197,7 +197,7 @@ public class ClientCommManager implements Runnable, MazeListener{
 			
 			// Periodically send message, even though there was no event
 			long curTime = new Date().getTime();
-			if (curTime - lastMessageSentAt >= 200) {
+			if (curTime - lastMessageSentAt >= 100) {
 				if (eventBuffer.size() > 0) {
 					multicast(eventBuffer.remove(0));
 				}
@@ -243,26 +243,23 @@ public class ClientCommManager implements Runnable, MazeListener{
 						Client client = game.getClient(msg.senderName);
 						switch (msg.messageType) {
 							case (GameMessage.GAME_MESSAGE_TYPE_FIRE):
-								if (!client.isDead) client.fire();
+								client.fire();
 								break;
 							case (GameMessage.GAME_MESSAGE_TYPE_MOVE_PLAYER_BACKWARD):
-								if (!client.isDead) client.backup();
+								 client.backup();
 								break;
 							
 							case (GameMessage.GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD):
-								if (!client.isDead) client.forward();
+								client.forward();
 								break;
 							
-							case (GameMessage.GAME_MESSAGE_TYPE_SPAWN_PLAYER):
-								game.maze.respawnClient(client, randomGen);
-								break;
 							
 							case (GameMessage.GAME_MESSAGE_TYPE_TURN_LEFT):
-								if (!client.isDead) client.turnLeft();
+								client.turnLeft();
 								break;
 							
 							case (GameMessage.GAME_MESSAGE_TYPE_TURN_RIGHT):
-								if (!client.isDead) client.turnRight();
+								 client.turnRight();
 								break;
 							default:
 								
@@ -271,7 +268,14 @@ public class ClientCommManager implements Runnable, MazeListener{
 	
 					}
 					
-
+					/*
+					 * Missile tick every 200ms
+					 * Since we send/receive message every 100ms, we have to tick
+					 * missile on every second message 
+					 */
+					if ((expectedNextMsgClock + 1) % 2 == 0) {
+						game.maze.tickMissile();
+					}
 				
 					expectedNextMsgClock++;
 				}
@@ -281,41 +285,4 @@ public class ClientCommManager implements Runnable, MazeListener{
 		}
 	}
 
-	@Override
-	public void mazeUpdate() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void clientKilled(Client source, Client target) {
-		if (target instanceof GUIClient) {
-			GameMessage msg = new GameMessage();
-			msg.senderName = myInfo.username;
-			msg.messageType = GameMessage.GAME_MESSAGE_TYPE_SPAWN_PLAYER;
-			
-			registerLocalEvent(msg);
-		}
-		
-	}
-
-	@Override
-	public void clientAdded(Client client) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void clientFired(Client client) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void clientRemoved(Client client) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
 }

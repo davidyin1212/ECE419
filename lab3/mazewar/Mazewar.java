@@ -151,7 +151,7 @@ public class Mazewar extends JFrame {
                 // Create communication Manager
                 commManager = new ClientCommManager(this);
                 
-                maze.addMazeListener(commManager);
+
                 // Have the ScoreTableModel listen to the maze to find
                 // out how to adjust scores.
                 scoreModel = new ScoreTableModel();
