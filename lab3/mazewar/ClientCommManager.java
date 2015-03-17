@@ -197,7 +197,7 @@ public class ClientCommManager implements Runnable, MazeListener{
 			
 			// Periodically send message, even though there was no event
 			long curTime = new Date().getTime();
-			if (curTime - lastMessageSentAt >= 100) {
+			if (curTime - lastMessageSentAt >= 200) {
 				if (eventBuffer.size() > 0) {
 					multicast(eventBuffer.remove(0));
 				}
@@ -221,6 +221,12 @@ public class ClientCommManager implements Runnable, MazeListener{
 				// Yes we received message from each peer
 				if (msgRdy) {
 			
+					/*
+					 * Missile tick every 200ms
+					 */
+					game.maze.tickMissile();
+					
+					
 					toBeDispatched.add(getNextLocalMessage());
 					
 					for (ClientCommWorker cm : peers) {
@@ -265,14 +271,8 @@ public class ClientCommManager implements Runnable, MazeListener{
 	
 					}
 					
-					/*
-					 * Missile tick every 200ms
-					 * Since we send/receive message every 100ms, we have to tick
-					 * missile on every second message 
-					 */
-					if ((expectedNextMsgClock + 1) % 2 == 0) {
-						game.maze.tickMissile();
-					}
+
+				
 					expectedNextMsgClock++;
 				}
 				
