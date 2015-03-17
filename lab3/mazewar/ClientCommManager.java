@@ -78,7 +78,10 @@ public class ClientCommManager implements Runnable, MazeListener{
 			connListeningSocket = new ServerSocket(0);
 			myInfo = new ClientInfo();
 			//myInfo.addr = connListeningSocket.getInetAddress();
-			myInfo.addr = InetAddress.getLocalHost().getHostAddress();
+			myInfo.addr = InetAddress.getByName( InetAddress.getLocalHost().getHostAddress());
+			//myInfo.addr = InetAddress.getLocalHost().getHostAddress();
+			System.out.println("fucking shit" +  InetAddress.getLocalHost().getHostAddress());
+			
 			myInfo.portNo = connListeningSocket.getLocalPort();
 			connectionListener = new ClientConnectionListener(this);
 			peers = new Vector<ClientCommWorker>();
