@@ -243,14 +243,14 @@ public class ClientCommManager implements Runnable, MazeListener{
 						Client client = game.getClient(msg.senderName);
 						switch (msg.messageType) {
 							case (GameMessage.GAME_MESSAGE_TYPE_FIRE):
-								client.fire();
+								if (!client.isDead) client.fire();
 								break;
 							case (GameMessage.GAME_MESSAGE_TYPE_MOVE_PLAYER_BACKWARD):
-								client.backup();
+								if (!client.isDead) client.backup();
 								break;
 							
 							case (GameMessage.GAME_MESSAGE_TYPE_MOVE_PLAYER_FORWARD):
-								client.forward();
+								if (!client.isDead) client.forward();
 								break;
 							
 							case (GameMessage.GAME_MESSAGE_TYPE_SPAWN_PLAYER):
@@ -258,11 +258,11 @@ public class ClientCommManager implements Runnable, MazeListener{
 								break;
 							
 							case (GameMessage.GAME_MESSAGE_TYPE_TURN_LEFT):
-								client.turnLeft();
+								if (!client.isDead) client.turnLeft();
 								break;
 							
 							case (GameMessage.GAME_MESSAGE_TYPE_TURN_RIGHT):
-								client.turnRight();
+								if (!client.isDead) client.turnRight();
 								break;
 							default:
 								
