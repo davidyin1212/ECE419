@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.Vector;  
 import java.util.Map;
 import java.util.Set;
@@ -382,6 +383,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener {
         
         private synchronized Collection moveProjectile(Projectile prj) {
                 Collection deadPrj = new LinkedList();
+                
                 assert(prj != null);
                 
                 Object o = projectileMap.get(prj);
@@ -598,7 +600,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener {
         /**
          * Mapping from {@link Projectile}s to {@link DirectedPoint}s. 
          */
-        private final Map projectileMap = new HashMap();
+        private final Map projectileMap = new TreeMap<Projectile, DirectedPoint>();
         
         /**
          * The set of {@link Client}s that have {@link Projectile}s in 

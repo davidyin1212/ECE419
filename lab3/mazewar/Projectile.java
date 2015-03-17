@@ -48,4 +48,9 @@ public class Projectile {
         public Client getOwner() {
                 return this.owner;
         }
+        
+        public int compareTo(Object other) {
+        	Projectile otherPrj = (Projectile) other;
+        	return this.owner.getName().compareTo(otherPrj.owner.getName());
+        }
 }
