@@ -219,12 +219,7 @@ public class ClientCommManager implements Runnable {
 					}
 				}
 				// Yes we received message from each peer
-				if (msgRdy) {
-			
-					/*
-					 * Missile tick every 200ms
-					 */
-					game.maze.tickMissile();
+				if (msgRdy) {	
 					
 					
 					toBeDispatched.add(getNextLocalMessage());
