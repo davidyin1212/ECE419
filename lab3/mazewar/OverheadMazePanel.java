@@ -195,6 +195,7 @@ public class OverheadMazePanel extends JPanel implements MazeListener {
                                                                 
                                                         double xoffset = llx + j*cellwidth + (cellwidth/2.0);
                                                         double yoffset = lly + i*cellheight + (cellheight/2.0);
+                                                        if (c.isDead) return;
                                                         Direction orient = c.getOrientation();
                                                         g2.translate(xoffset, yoffset);
                                                         double rotation = 0.0; 
