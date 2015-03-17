@@ -50,6 +50,7 @@ public class Projectile {
         }
         
         public int compareTo(Object other) {
+        	System.out.println("CompareTo");
         	Projectile otherPrj = (Projectile) other;
         	return this.owner.getName().compareTo(otherPrj.owner.getName());
         }
