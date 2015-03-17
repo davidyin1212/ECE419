@@ -23,7 +23,7 @@ USA.
  * @version $Id: Projectile.java 350 2004-01-24 05:31:17Z geoffw $
  */
 
-public class Projectile {
+public class Projectile implements Comparable<Projectile>{
 
         /**
          * The {@link Client} that owns this {@link Projectile}.
@@ -49,9 +49,12 @@ public class Projectile {
                 return this.owner;
         }
         
-        public int compareTo(Object other) {
-        	System.out.println("CompareTo");
-        	Projectile otherPrj = (Projectile) other;
+
+
+		@Override
+		public int compareTo(Projectile otherPrj) {
+			// TODO Auto-generated method stub
+
         	return this.owner.getName().compareTo(otherPrj.owner.getName());
-        }
+		}
 }
