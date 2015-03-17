@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collections;
@@ -76,7 +77,8 @@ public class ClientCommManager implements Runnable, MazeListener{
 			
 			connListeningSocket = new ServerSocket(0);
 			myInfo = new ClientInfo();
-			myInfo.addr = connListeningSocket.getInetAddress();
+			//myInfo.addr = connListeningSocket.getInetAddress();
+			myInfo.addr = InetAddress.getLocalHost().getHostAddress();
 			myInfo.portNo = connListeningSocket.getLocalPort();
 			connectionListener = new ClientConnectionListener(this);
 			peers = new Vector<ClientCommWorker>();
