@@ -1,0 +1,42 @@
+========================== ECE 419 Lab 2 ==========================
+Team Members
+First Name: Yong Ro		Last Name: Park 		Student#: 997011816
+First Name: David		Last Name: Yin			Student#: 998270767
+
+
+==================== How to Run in UG Lab =========================
+Step1: Run makefile
+
+make
+
+
+Step2: Run Mazewar Naming Server
+Note that our MazewarServer takes 1 mandatory argument and 1 optional
+argument as following:
+	java NamingServer PORT_NUMBER
+
+
+
+Step3: Run Mazewar (client)
+
+	java Mazewar NAMING_SERVER_HOSTNAME NAMING_SERVER_PORT_NUMBER
+
+Note 
+
+	1) If we don't have enough number of required players yet, 
+		game won't be started until we have 4 players.
+
+	2) Upon providing existing username when joining game,
+		the client will be asked to provide with other username.
+
+Step4: When game starts, you can kill NamingService and will not affect 
+	existing game.
+
+
+==================== What we have done ========================
+We have handled everything as guided in handout except for bonus tasks.
+
+
+
+
+
